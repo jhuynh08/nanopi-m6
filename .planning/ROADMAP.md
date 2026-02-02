@@ -12,7 +12,7 @@ This roadmap delivers a bootable Talos Linux image for the NanoPi M6 (RK3588S) t
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Environment Setup** - Fork repo, verify build pipeline, establish UART debug access
+- [ ] **Phase 1: Environment Setup** - Fork repo, verify build pipeline, establish flash/verification workflow
 - [ ] **Phase 2: Bootloader Bring-Up** - U-Boot defconfig, ATF, DDR blob - boot to U-Boot console
 - [ ] **Phase 3: Device Tree & Kernel** - DTB compilation, kernel boot, essential driver validation
 - [ ] **Phase 4: Overlay Integration** - Installer binary, profile YAML, bootable Talos image
@@ -27,15 +27,15 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Requirements**: None (foundation work enabling requirements)
 **Success Criteria** (what must be TRUE):
   1. Forked repository builds successfully with bldr/kres toolchain
-  2. UART console (1500000 baud) shows output from connected NanoPi M6
-  3. Docker buildx produces ARM64 artifacts on development machine
-  4. Build artifacts can be flashed to microSD for testing
-**Plans**: TBD
+  2. Docker buildx produces ARM64 artifacts on development machine
+  3. Build artifacts can be flashed to microSD for testing
+  4. Hardware baseline confirmed (Armbian boots on NanoPi M6)
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 01-01: Fork and baseline upgrade
-- [ ] 01-02: Build pipeline verification
-- [ ] 01-03: UART console and flash workflow
+- [ ] 01-01-PLAN.md - Fork repository and establish project baseline
+- [ ] 01-02-PLAN.md - Configure Docker buildx and verify local/CI builds
+- [ ] 01-03-PLAN.md - Create flash script and verify hardware baseline
 
 ### Phase 2: Bootloader Bring-Up
 **Goal**: NanoPi M6 boots to U-Boot console via UART
@@ -127,7 +127,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Environment Setup | 0/3 | Not started | - |
+| 1. Environment Setup | 0/3 | Planned | - |
 | 2. Bootloader Bring-Up | 0/3 | Not started | - |
 | 3. Device Tree & Kernel | 0/3 | Not started | - |
 | 4. Overlay Integration | 0/3 | Not started | - |
