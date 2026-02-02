@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 1 of 6 (Environment Setup)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-02-02 - Completed 01-01-PLAN.md (Fork and Project Baseline)
+Last activity: 2026-02-02 - Completed 01-02-PLAN.md (Build Pipeline Verification)
 
-Progress: [=...................] 5%
+Progress: [==..................] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 5 min
-- Total execution time: 5 min
+- Total plans completed: 2
+- Average duration: ~1h 15min
+- Total execution time: ~2h 35min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-environment-setup | 1 | 5 min | 5 min |
+| 01-environment-setup | 2 | ~2h 35min | ~1h 15min |
 
 **Recent Trend:**
-- Last 5 plans: 5 min
-- Trend: N/A (first plan)
+- Last 5 plans: 5 min, ~2.5h (including build time)
+- Trend: Build-heavy plans take significantly longer
 
 *Updated after each plan completion*
 
@@ -47,6 +47,8 @@ Recent decisions affecting current work:
 - [Init]: Target eMMC boot for production (pending validation)
 - [01-01]: Origin remote points to jhuynh08/nanopi-m6
 - [01-01]: Upstream remote points to milas/talos-sbc-rk3588 for syncing
+- [01-02]: Keep upstream CI workflow using GHCR (not Docker Hub)
+- [01-02]: Local build command: `make local-talos-sbc-rk3588-mainline DEST=_out`
 
 ### Pending Todos
 
@@ -59,11 +61,15 @@ None yet.
 - Must adapt from R6C/R6S - may require iterative debugging
 - UART console access critical for debugging boot failures
 
+**CI Configuration:**
+- Upstream workflow uses self-hosted runners (`pkgs` label)
+- May need to modify for GitHub-hosted runners or set up self-hosted
+
 ## Session Continuity
 
 Last session: 2026-02-02
-Stopped at: Completed 01-01-PLAN.md
-Resume file: .planning/phases/01-environment-setup/01-02-PLAN.md
+Stopped at: Completed 01-02-PLAN.md
+Resume file: .planning/phases/01-environment-setup/01-03-PLAN.md
 
 ---
 *State initialized: 2026-02-02*
