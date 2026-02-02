@@ -3,6 +3,7 @@ variant: scratch
 dependencies:
   - stage: u-boot-rock-5a
   - stage: u-boot-rock-5b
+  - stage: u-boot-nanopi-m6
 finalize:
   - from: /rootfs
     to: /rootfs
