@@ -64,7 +64,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | HDMI/Display output | Headless server use case, adds complexity |
 | GPU acceleration | Not needed for Kubernetes node workloads |
 | Audio support | Not needed for server use case |
-| WiFi/Bluetooth | Using wired Gigabit Ethernet, no built-in WiFi |
+| WiFi/Bluetooth | Using wired Gigabit Ethernet |
 | NPU (AI accelerator) | Requires out-of-tree rknn kernel module, not needed |
 | VPU (video encode/decode) | No media workloads planned, drivers incomplete |
 | Upstream mainline patches | Personal use only, not pursuing kernel/U-Boot upstreaming |
@@ -100,8 +100,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 **Coverage:**
 - v1 requirements: 21 total
 - Mapped to phases: 21
-- Unmapped: 0 ✓
+- Unmapped: 0
+
+**Phase 1 Note:** Environment Setup has no requirements - it delivers the foundation (fork, build pipeline, UART access) that enables all subsequent requirement work.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after initial definition*
+*Last updated: 2026-02-02 after roadmap creation*
