@@ -1,0 +1,20 @@
+name: talos-sbc-rk3588-{{ .BUILD_ARG_KERNEL_VARIANT }}
+variant: scratch
+shell: /toolchain/bin/bash
+dependencies:
+  - stage: base
+  - stage: u-boot
+    platform: linux/arm64
+  - stage: overlay-rk3588
+    platform: linux/arm64
+  - stage: talos-kernel-rk3588-{{ .BUILD_ARG_KERNEL_VARIANT }}
+    platform: linux/arm64
+  - stage: profiles
+steps:
+  - prepare:
+      - |
+        mkdir -p /rootfs/artifacts/arm64/dtb/rockchip
+        cp /dtb/rockchip/rk3588*.dtb /rootfs/artifacts/arm64/dtb/rockchip/
+finalize:
+  - from: /rootfs
+    to: /
