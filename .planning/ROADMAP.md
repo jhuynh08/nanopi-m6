@@ -38,20 +38,20 @@ Plans:
 - [x] 01-03-PLAN.md - Create flash script and verify hardware baseline
 
 ### Phase 2: Bootloader Bring-Up
-**Goal**: NanoPi M6 boots to U-Boot console via UART
+**Goal**: NanoPi M6 boots to U-Boot (verified via kernel reaching HDMI output or LED activity)
 **Depends on**: Phase 1
 **Requirements**: BOOT-01, BOOT-02, BOOT-03
 **Success Criteria** (what must be TRUE):
-  1. U-Boot console prompt appears via UART after power-on
-  2. DDR memory test passes (LPDDR5 initialized correctly)
-  3. U-Boot can read files from microSD card
+  1. U-Boot binary compiles with nanopi-r6c-rk3588s_defconfig
+  2. DDR memory initializes (LPDDR5 blob loads correctly)
+  3. Boot activity observable (LED blink or eventual kernel HDMI output)
   4. Recovery procedure documented and tested (MaskROM mode)
-**Plans**: TBD
+**Plans**: 3 plans in 2 waves
 
 Plans:
-- [ ] 02-01: U-Boot defconfig adaptation
-- [ ] 02-02: ATF and DDR blob integration
-- [ ] 02-03: Boot validation and recovery procedures
+- [ ] 02-01-PLAN.md - Create U-Boot build configuration for NanoPi M6
+- [ ] 02-02-PLAN.md - Create recovery and iteration documentation
+- [ ] 02-03-PLAN.md - Build U-Boot and verify boot on hardware
 
 ### Phase 3: Device Tree & Kernel
 **Goal**: Linux kernel boots with essential NanoPi M6 hardware functional
@@ -127,8 +127,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Environment Setup | 3/3 | ✓ Complete | 2026-02-02 |
-| 2. Bootloader Bring-Up | 0/3 | Not started | - |
+| 1. Environment Setup | 3/3 | Complete | 2026-02-02 |
+| 2. Bootloader Bring-Up | 0/3 | Ready | - |
 | 3. Device Tree & Kernel | 0/3 | Not started | - |
 | 4. Overlay Integration | 0/3 | Not started | - |
 | 5. Cluster Integration | 0/4 | Not started | - |
@@ -136,4 +136,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-02 (Phase 1 complete)*
+*Last updated: 2026-02-02 (Phase 2 planned)*
