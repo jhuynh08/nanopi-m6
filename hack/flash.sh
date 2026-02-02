@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 #
 # Flash an image to SD card (macOS)
-# Usage: ./hack/flash.sh <image-file> [disk-number]
+# Usage: ./hack/flash.sh <image-file> [disk-number] [--bootloader]
 #
-# Example: ./hack/flash.sh _out/metal-arm64.raw 2
+# Examples:
+#   ./hack/flash.sh _out/metal-arm64.raw 2              # Full disk image at sector 0
+#   ./hack/flash.sh u-boot-rockchip.bin 2 --bootloader  # Bootloader at sector 64
 #
 
 set -euo pipefail
 
 IMAGE="${1:-}"
 DISK_NUM="${2:-}"
+BOOTLOADER_MODE="${3:-}"
 
 # Colors for output
 RED='\033[0;31m'
@@ -56,9 +59,19 @@ echo "================================================"
 echo "Target: $DISK ($DISK_SIZE)"
 echo "Name: $DISK_NAME"
 echo "Image: $IMAGE ($(du -h "$IMAGE" | cut -f1))"
+if [[ "$BOOTLOADER_MODE" == "--bootloader" ]]; then
+    echo "Mode: BOOTLOADER (writing at sector 64)"
+else
+    echo "Mode: FULL DISK (writing at sector 0)"
+fi
 echo "================================================"
 echo ""
-warn "This will ERASE ALL DATA on $DISK"
+
+if [[ "$BOOTLOADER_MODE" == "--bootloader" ]]; then
+    warn "This will OVERWRITE the bootloader area on $DISK"
+else
+    warn "This will ERASE ALL DATA on $DISK"
+fi
 read -p "Type 'yes' to continue: " CONFIRM
 
 [[ "$CONFIRM" != "yes" ]] && error "Aborted by user"
@@ -68,9 +81,16 @@ info "Unmounting $DISK..."
 diskutil unmountDisk "$DISK" || warn "Unmount failed, continuing anyway"
 
 # Flash image
-info "Flashing image (this may take several minutes)..."
-echo "Command: sudo dd if=$IMAGE of=$RDISK bs=1m status=progress"
-sudo dd if="$IMAGE" of="$RDISK" bs=1m status=progress
+if [[ "$BOOTLOADER_MODE" == "--bootloader" ]]; then
+    # Rockchip bootloader: write at sector 64 (32KB offset)
+    info "Flashing bootloader at sector 64..."
+    echo "Command: sudo dd if=$IMAGE of=$RDISK seek=64 bs=512 status=progress"
+    sudo dd if="$IMAGE" of="$RDISK" seek=64 bs=512 status=progress
+else
+    info "Flashing full disk image (this may take several minutes)..."
+    echo "Command: sudo dd if=$IMAGE of=$RDISK bs=1m status=progress"
+    sudo dd if="$IMAGE" of="$RDISK" bs=1m status=progress
+fi
 
 # Sync and eject
 info "Syncing..."

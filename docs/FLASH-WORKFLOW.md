@@ -14,11 +14,14 @@ This document describes how to flash images to SD card and verify boot on NanoPi
 ### Using the Flash Script (Recommended)
 
 ```bash
-# Flash a built image
+# Flash a full disk image (Armbian, Talos metal)
 ./hack/flash.sh _out/metal-arm64.raw
 
 # Or specify disk number directly (skip interactive prompt)
 ./hack/flash.sh _out/metal-arm64.raw 2
+
+# Flash bootloader only (U-Boot at sector 64 for Rockchip)
+./hack/flash.sh _out/artifacts/arm64/u-boot/nanopi-m6/u-boot-rockchip.bin 2 --bootloader
 ```
 
 The script will:
@@ -26,6 +29,7 @@ The script will:
 2. Ask for confirmation before writing
 3. Refuse to write to internal disks
 4. Use fast raw device (rdisk) for better performance
+5. Write at correct offset (sector 0 for full image, sector 64 for bootloader)
 
 ### Manual Flashing
 
@@ -130,8 +134,11 @@ Recommended: UHS-I U3 or better
 ## Quick Reference
 
 ```bash
-# Flash image
+# Flash full disk image
 ./hack/flash.sh <image-file>
+
+# Flash bootloader only (Rockchip U-Boot)
+./hack/flash.sh <u-boot-rockchip.bin> <disk-num> --bootloader
 
 # Check network after boot
 ping <ip-from-dhcp-leases>
