@@ -13,7 +13,9 @@ steps:
     prepare:
       - |
         cd /src
-        make nanopi-r6c-rk3588s_defconfig
+        # Using rock5a-rk3588s_defconfig as base (both boards use RK3588S)
+        # nanopi-r6c-rk3588s_defconfig not available in Collabora U-Boot fork
+        make rock5a-rk3588s_defconfig
     build:
       - |
         cd /src
