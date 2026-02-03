@@ -17,7 +17,10 @@ import (
 )
 
 const (
+	// Standard offset for u-boot-rockchip.bin (sector 64)
 	ubootOffset int64 = 512 * 64
+	// Offset for vendor U-Boot uboot.img (sector 16384 = 8MB)
+	ubootImgOffset int64 = 512 * 16384
 )
 
 func main() {
@@ -91,13 +94,37 @@ func (i *RK3588Installer) Install(options overlay.InstallOptions[rk3588ExtraOpts
 	}
 	defer f.Close() //nolint:errcheck
 
-	uboot, err := os.ReadFile(filepath.Join(options.ArtifactsPath, fmt.Sprintf("arm64/u-boot/%s/u-boot-rockchip.bin", options.ExtraOptions.Board)))
-	if err != nil {
-		return fmt.Errorf("reading u-boot: %w", err)
-	}
+	// NanoPi M6 uses vendor U-Boot format with two files at different offsets
+	if options.ExtraOptions.Board == "nanopi-m6" {
+		// Write idbloader.img at sector 64 (same offset as standard u-boot)
+		idbloader, err := os.ReadFile(filepath.Join(options.ArtifactsPath,
+			fmt.Sprintf("arm64/u-boot/%s/idbloader.img", options.ExtraOptions.Board)))
+		if err != nil {
+			return fmt.Errorf("reading idbloader: %w", err)
+		}
+		if _, err = f.WriteAt(idbloader, ubootOffset); err != nil {
+			return fmt.Errorf("writing idbloader: %w", err)
+		}
 
-	if _, err = f.WriteAt(uboot, ubootOffset); err != nil {
-		return fmt.Errorf("writing u-boot: %w", err)
+		// Write uboot.img at sector 16384 (8MB offset)
+		ubootImg, err := os.ReadFile(filepath.Join(options.ArtifactsPath,
+			fmt.Sprintf("arm64/u-boot/%s/uboot.img", options.ExtraOptions.Board)))
+		if err != nil {
+			return fmt.Errorf("reading uboot.img: %w", err)
+		}
+		if _, err = f.WriteAt(ubootImg, ubootImgOffset); err != nil {
+			return fmt.Errorf("writing uboot.img: %w", err)
+		}
+	} else {
+		// Standard boards use single u-boot-rockchip.bin
+		uboot, err := os.ReadFile(filepath.Join(options.ArtifactsPath,
+			fmt.Sprintf("arm64/u-boot/%s/u-boot-rockchip.bin", options.ExtraOptions.Board)))
+		if err != nil {
+			return fmt.Errorf("reading u-boot: %w", err)
+		}
+		if _, err = f.WriteAt(uboot, ubootOffset); err != nil {
+			return fmt.Errorf("writing u-boot: %w", err)
+		}
 	}
 
 	// NB: In the case that the block device is a loopback device, we sync here
