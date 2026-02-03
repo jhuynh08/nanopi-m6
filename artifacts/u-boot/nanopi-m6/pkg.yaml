@@ -13,9 +13,28 @@ steps:
     prepare:
       - |
         cd /src
-        # Using rock5a-rk3588s_defconfig as base (both boards use RK3588S)
-        # nanopi-r6c-rk3588s_defconfig not available in Collabora U-Boot fork
+
+        # Copy minimal NanoPi M6 device tree (local, compatible with Collabora U-Boot)
+        # Based on Armbian's DTS but stripped down for U-Boot 2023.07 compatibility
+        # Key differences from Rock5A: LEDs (GPIO1_A4/A6), tx_delay (0x42), SD card GPIO
+        cp /pkg/rk3588s-nanopi-m6.dts arch/arm/dts/
+
+        # Add nanopi-m6 to the device tree Makefile so it gets compiled
+        # Insert after rk3588s-rock-5a.dtb line
+        sed -i '/rk3588s-rock-5a.dtb/a\	rk3588s-nanopi-m6.dtb \\' arch/arm/dts/Makefile
+
+        # Start with rock5a defconfig (compatible with Collabora U-Boot fork)
         make rock5a-rk3588s_defconfig
+
+        # Patch config to use NanoPi M6 device tree instead of Rock 5A
+        # This is the ROOT CAUSE fix: wrong device tree = wrong GPIO/PMIC init = boot failure
+        sed -i 's|CONFIG_DEFAULT_DEVICE_TREE="rk3588s-rock-5a"|CONFIG_DEFAULT_DEVICE_TREE="rk3588s-nanopi-m6"|g' .config
+        sed -i 's|CONFIG_DEFAULT_FDT_FILE="rockchip/rk3588s-rock-5a.dtb"|CONFIG_DEFAULT_FDT_FILE="rockchip/rk3588s-nanopi-m6.dtb"|g' .config
+        # Also update OF_LIST which is used by binman for FIT image generation
+        sed -i 's|CONFIG_OF_LIST="rk3588s-rock-5a"|CONFIG_OF_LIST="rk3588s-nanopi-m6"|g' .config
+
+        # Resolve any new/changed options automatically
+        make olddefconfig
     build:
       - |
         cd /src
