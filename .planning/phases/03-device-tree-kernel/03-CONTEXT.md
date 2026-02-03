@@ -14,8 +14,10 @@ Linux kernel boots with essential NanoPi M6 hardware functional. This includes g
 ## Implementation Decisions
 
 ### Device Tree Source
-- Use FriendlyELEC vendor DTS as the base (matches vendor U-Boot we're using)
+- Use pre-extracted FriendlyELEC vendor DTB (same approach as vendor U-Boot)
+- Extracted from: rk3588-sd-ubuntu-noble-minimal-6.1-arm64-20251222.img
 - Single DTB variant, not multiple configurations
+- Note: FriendlyELEC's DTS is incompatible with Talos/mainline kernel (uses vendor bindings), so we use the compiled DTB directly
 
 ### Kernel Source
 - Use Talos-provided kernel (milas/talos-sbc-rk3588 base)

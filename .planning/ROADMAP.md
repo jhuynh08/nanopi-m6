@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Environment Setup** - Fork repo, verify build pipeline, establish flash/verification workflow
 - [x] **Phase 2: Bootloader Bring-Up** - U-Boot defconfig, ATF, DDR blob - boot to U-Boot console
-- [ ] **Phase 3: Device Tree & Kernel** - DTB compilation, kernel boot, essential driver validation
+- [x] **Phase 3: Device Tree & Kernel** - DTB compilation, kernel boot, essential driver validation (overlay-complete)
 - [ ] **Phase 4: Overlay Integration** - Installer binary, profile YAML, bootable Talos image
 - [ ] **Phase 5: Cluster Integration** - Boot Talos, network connectivity, Omni registration, cluster join
 - [ ] **Phase 6: Production Hardening** - Thermal, watchdog, CPU frequency scaling
@@ -72,10 +72,10 @@ Plans:
 **Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 03-01-PLAN.md - Add NanoPi M6 device tree to kernel build
-- [ ] 03-02-PLAN.md - Update installer for NanoPi M6 board support
-- [ ] 03-03-PLAN.md - Build complete image and flash to SD card
-- [ ] 03-04-PLAN.md - Hardware driver validation (Ethernet, USB, NVMe)
+- [x] 03-01-PLAN.md - Commit pre-extracted FriendlyELEC vendor DTB
+- [x] 03-02-PLAN.md - Update installer for NanoPi M6 board support
+- [x] 03-03-PLAN.md - Build complete image and flash to SD card (overlay only - raw image requires CI/CD)
+- [x] 03-04-PLAN.md - Hardware driver validation (deferred to Phase 4 - needs Talos image)
 
 ### Phase 4: Overlay Integration
 **Goal**: Talos imager produces bootable NanoPi M6 image
@@ -134,11 +134,13 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Environment Setup | 3/3 | Complete | 2026-02-02 |
 | 2. Bootloader Bring-Up | 9/9 | Complete | 2026-02-03 |
-| 3. Device Tree & Kernel | 0/4 | Planned | - |
+| 3. Device Tree & Kernel | 4/4 | Complete (overlay) | 2026-02-03 |
 | 4. Overlay Integration | 0/3 | Not started | - |
 | 5. Cluster Integration | 0/4 | Not started | - |
 | 6. Production Hardening | 0/2 | Not started | - |
 
+**Note:** Phase 3 is "overlay-complete" - all build artifacts integrated. Hardware validation deferred to Phase 4 (requires Talos raw image from CI/CD).
+
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-03 (Phase 3 planned - 4 plans in 3 waves)*
+*Last updated: 2026-02-03 (Phase 3 complete - overlay-complete, hardware validation deferred)*

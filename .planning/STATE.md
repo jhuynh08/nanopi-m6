@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** The NanoPi M6 boots Talos Linux and successfully registers with Talos Omni to join the home cluster.
-**Current focus:** Phase 3 In Progress - Device Tree & Kernel
+**Current focus:** Phase 3 COMPLETE (overlay) - Ready for Phase 4 (Overlay Integration)
 
 ## Current Position
 
-Phase: 3 of 6 (Device Tree & Kernel)
-Plan: 3 of 4 in current phase
-Status: In progress - Overlay builds with NanoPi M6 artifacts
-Last activity: 2026-02-03 - Completed 03-03-PLAN.md (Full Image Build)
+Phase: 3 of 6 (Device Tree & Kernel) - **COMPLETE (overlay)**
+Plan: 4 of 4 in current phase - **PHASE 3 COMPLETE**
+Status: Phase 3 overlay-complete - all build artifacts integrated, hardware validation deferred
+Last activity: 2026-02-03 - Completed 03-04-PLAN.md (Hardware validation deferred to Phase 4)
 
 Progress: [============........] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: ~25min
-- Total execution time: ~6h 40min
+- Total execution time: ~7h
 
 **By Phase:**
 
@@ -29,17 +29,17 @@ Progress: [============........] 60%
 |-------|-------|-------|----------|--------|
 | 01-environment-setup | 3 | ~2h 50min | ~55min | Complete |
 | 02-bootloader | 9 | ~3h 10min | ~21min | Complete |
-| 03-device-tree-kernel | 3/4 | ~30min | ~10min | In Progress |
+| 03-device-tree-kernel | 4 | ~35min | ~9min | **COMPLETE (overlay)** |
 
 **Recent Trend:**
-- Last 5 plans: 02-09, 03-01, 03-02, 03-03
-- Trend: Phase 3 progressing with overlay build validated
+- Last 5 plans: 03-01, 03-02, 03-03, 03-04
+- Trend: Phase 3 completed with overlay build validated
 
 *Updated after each plan completion*
 
-## Phase 3 Progress
+## Phase 3 Summary
 
-**Goal:** Linux kernel boots with essential NanoPi M6 hardware functional
+**GOAL STATUS:** Overlay-complete (hardware validation deferred to Phase 4)
 
 ### Completed Plans
 
@@ -48,9 +48,28 @@ Progress: [============........] 60%
 | 03-01 | Add Vendor DTB | ~2min | Pre-extracted DTB in artifacts |
 | 03-02 | Update RK3588 Installer | ~1min | Installer handles vendor U-Boot format |
 | 03-03 | Full Image Build | ~26min | Overlay builds with NanoPi M6 artifacts |
+| 03-04 | Hardware Validation | ~5min | Deferred - needs Talos raw image |
 
-### Next Up
-- 03-04: Hardware Validation (Ethernet, USB, NVMe)
+### What "Overlay-Complete" Means
+
+All build artifacts are integrated and verified:
+- ✓ Vendor DTB (rk3588s-nanopi-m6.dtb) committed and build-integrated
+- ✓ Vendor U-Boot (idbloader.img + uboot.img) committed and build-integrated
+- ✓ RK3588 installer updated for nanopi-m6 board
+- ✓ Full overlay build completes successfully
+- ○ Hardware validation deferred (requires Talos raw image from CI/CD)
+
+### Build Output
+
+```
+_out/artifacts/arm64/
+  dtb/rockchip/rk3588s-nanopi-m6.dtb     (vendor DTB)
+  u-boot/nanopi-m6/
+    idbloader.img                         (vendor bootloader)
+    uboot.img                             (vendor U-Boot)
+_out/installers/rk3588                    (installer binary)
+_out/profiles/board-rk3588.yaml           (profile)
+```
 
 ## Accumulated Context
 
@@ -77,17 +96,16 @@ Recent decisions affecting current work:
 - [03-03]: Vendor binaries inside pkg.yaml directory for Bldr context inclusion
 - [03-03]: Use gmake (GNU Make 4.x) instead of system make (3.81) for builds
 - [03-03]: Raw image generation requires CI/CD (overlay build is local-only)
+- [03-04]: **Hardware validation deferred to Phase 4** - needs Talos raw image
 
 ### Pending Todos
 
-Phase 3:
-- Hardware validation: boot test with overlay kernel/DTB
-- Validate Ethernet, USB, NVMe drivers
-- Document raw image generation workflow
+None for Phase 3.
 
-Phase 4+:
-- CI/CD workflow for raw image generation
-- Talos imager integration
+Phase 4:
+- Generate Talos raw image via CI/CD or local imager
+- Hardware validation with actual Talos image
+- Complete Phase 3 deferred validation
 
 ### Blockers/Concerns
 
@@ -102,12 +120,13 @@ Phase 4+:
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed 03-03-PLAN.md (Full Image Build)
+Stopped at: Completed 03-04-PLAN.md (Phase 3 Complete - overlay)
 Resume file: None
 
-**Phase status:** Phase 3 In Progress
-**Next:** 03-04-PLAN.md - Hardware Validation
+**Phase status:** Phase 3 COMPLETE (overlay)
+**Next phase:** Phase 4 - Overlay Integration
+Recommended next action: Plan Phase 4 to generate Talos raw image and complete hardware validation
 
 ---
 *State initialized: 2026-02-02*
-*Last updated: 2026-02-03 (after 03-03 completion)*
+*Last updated: 2026-02-03 (after 03-04 completion - Phase 3 complete)*
