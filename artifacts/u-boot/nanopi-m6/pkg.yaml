@@ -22,12 +22,9 @@ steps:
 
         # Download NanoPi M6 device tree from Armbian
         # This DTS includes correct GPIO pins, PMIC config, ethernet, and LED definitions
-        curl -fsSL -o arch/arm/dts/rk3588s-nanopi-m6.dts \
+        # U-Boot v2025.10 uses upstream DT location: dts/upstream/src/arm64/rockchip/
+        curl -fsSL -o dts/upstream/src/arm64/rockchip/rk3588s-nanopi-m6.dts \
           "https://raw.githubusercontent.com/armbian/build/main/patch/u-boot/v2025.10/dt_upstream_rockchip/rk3588s-nanopi-m6.dts"
-
-        # Add nanopi-m6 to the device tree Makefile so it gets compiled
-        # Insert after rk3588s-rock-5a.dtb line
-        sed -i '/rk3588s-rock-5a.dtb/a\	rk3588s-nanopi-m6.dtb \\' arch/arm/dts/Makefile
 
         # Use Armbian's M6 defconfig directly (no rock5a patching needed)
         make nanopi-m6-rk3588s_defconfig

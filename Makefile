@@ -19,8 +19,9 @@ KRES_IMAGE ?= ghcr.io/siderolabs/kres:latest
 CONFORMANCE_IMAGE ?= ghcr.io/siderolabs/conform:latest
 
 # source date epoch of first commit
+# Note: Use head -1 to handle forked repos with multiple root commits
 
-INITIAL_COMMIT_SHA := $(shell git rev-list --max-parents=0 HEAD)
+INITIAL_COMMIT_SHA := $(shell git rev-list --max-parents=0 HEAD | head -1)
 SOURCE_DATE_EPOCH := $(shell git log $(INITIAL_COMMIT_SHA) --pretty=%ct)
 
 # sync bldr image with pkgfile
