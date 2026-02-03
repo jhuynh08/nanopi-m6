@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-02)
 
 **Core value:** The NanoPi M6 boots Talos Linux and successfully registers with Talos Omni to join the home cluster.
-**Current focus:** Phase 3 COMPLETE (overlay) - Ready for Phase 4 (Overlay Integration)
+**Current focus:** Phase 4 IN PROGRESS (CI workflow configured, awaiting tag push)
 
 ## Current Position
 
-Phase: 3 of 6 (Device Tree & Kernel) - **COMPLETE (overlay)**
-Plan: 4 of 4 in current phase - **PHASE 3 COMPLETE**
-Status: Phase 3 overlay-complete - all build artifacts integrated, hardware validation deferred
-Last activity: 2026-02-03 - Completed 03-04-PLAN.md (Hardware validation deferred to Phase 4)
+Phase: 4 of 6 (Overlay Integration)
+Plan: 1 of 2 in current phase - **COMPLETE**
+Status: CI workflow configured with Docker Hub support and nanopi-m6 board
+Last activity: 2026-02-03 - Completed 04-01-PLAN.md (CI workflow Docker Hub integration)
 
-Progress: [============........] 60%
+Progress: [=============.......] 65%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16
-- Average duration: ~25min
-- Total execution time: ~7h
+- Total plans completed: 17
+- Average duration: ~24min
+- Total execution time: ~7h 10min
 
 **By Phase:**
 
@@ -29,47 +29,37 @@ Progress: [============........] 60%
 |-------|-------|-------|----------|--------|
 | 01-environment-setup | 3 | ~2h 50min | ~55min | Complete |
 | 02-bootloader | 9 | ~3h 10min | ~21min | Complete |
-| 03-device-tree-kernel | 4 | ~35min | ~9min | **COMPLETE (overlay)** |
+| 03-device-tree-kernel | 4 | ~35min | ~9min | Complete (overlay) |
+| 04-overlay-integration | 1 | ~8min | ~8min | **IN PROGRESS** |
 
 **Recent Trend:**
-- Last 5 plans: 03-01, 03-02, 03-03, 03-04
-- Trend: Phase 3 completed with overlay build validated
+- Last 5 plans: 03-02, 03-03, 03-04, 04-01
+- Trend: CI workflow ready, awaiting tag push to generate raw image
 
 *Updated after each plan completion*
 
-## Phase 3 Summary
+## Phase 4 Progress
 
-**GOAL STATUS:** Overlay-complete (hardware validation deferred to Phase 4)
+**GOAL:** Produce bootable Talos raw image via CI/CD
 
 ### Completed Plans
 
 | Plan | Name | Duration | Key Output |
 |------|------|----------|------------|
-| 03-01 | Add Vendor DTB | ~2min | Pre-extracted DTB in artifacts |
-| 03-02 | Update RK3588 Installer | ~1min | Installer handles vendor U-Boot format |
-| 03-03 | Full Image Build | ~26min | Overlay builds with NanoPi M6 artifacts |
-| 03-04 | Hardware Validation | ~5min | Deferred - needs Talos raw image |
+| 04-01 | CI Workflow Docker Hub Integration | ~8min | CI workflow with nanopi-m6 board |
 
-### What "Overlay-Complete" Means
+### What's Ready
 
-All build artifacts are integrated and verified:
-- ✓ Vendor DTB (rk3588s-nanopi-m6.dtb) committed and build-integrated
-- ✓ Vendor U-Boot (idbloader.img + uboot.img) committed and build-integrated
-- ✓ RK3588 installer updated for nanopi-m6 board
-- ✓ Full overlay build completes successfully
-- ○ Hardware validation deferred (requires Talos raw image from CI/CD)
+- CI workflow supports nanopi-m6 board with Docker Hub
+- Overlay push to docker.io/123417/talos-sbc-nanopi-m6 configured
+- Raw image generation configured for nanopi-m6
+- Cleanup handles both registry logouts
 
-### Build Output
+### User Setup Required
 
-```
-_out/artifacts/arm64/
-  dtb/rockchip/rk3588s-nanopi-m6.dtb     (vendor DTB)
-  u-boot/nanopi-m6/
-    idbloader.img                         (vendor bootloader)
-    uboot.img                             (vendor U-Boot)
-_out/installers/rk3588                    (installer binary)
-_out/profiles/board-rk3588.yaml           (profile)
-```
+1. Configure `DOCKERHUB_USERNAME` variable in GitHub repo settings
+2. Configure `DOCKERHUB_TOKEN` secret in GitHub repo settings
+3. Push version tag (e.g., v1.10.6-nanopi-m6) to trigger CI
 
 ## Accumulated Context
 
@@ -97,36 +87,38 @@ Recent decisions affecting current work:
 - [03-03]: Use gmake (GNU Make 4.x) instead of system make (3.81) for builds
 - [03-03]: Raw image generation requires CI/CD (overlay build is local-only)
 - [03-04]: **Hardware validation deferred to Phase 4** - needs Talos raw image
+- [04-01]: Use Docker Hub (docker.io/123417/talos-sbc-nanopi-m6) for nanopi-m6 overlay
+- [04-01]: Conditional step splitting for GHCR vs Docker Hub boards
 
 ### Pending Todos
 
-None for Phase 3.
-
 Phase 4:
-- Generate Talos raw image via CI/CD or local imager
-- Hardware validation with actual Talos image
-- Complete Phase 3 deferred validation
+- Configure Docker Hub credentials in GitHub
+- Push version tag to trigger CI
+- Download raw image artifact
+- Hardware validation with Talos raw image
+- Complete Phase 3 deferred validation (Ethernet, NVMe)
 
 ### Blockers/Concerns
 
 **No critical blockers.**
 
 **Considerations:**
-- Raw image generation requires CI/CD or local Talos imager setup
+- Self-hosted runners required (existing workflow uses [self-hosted, pkgs])
+- Docker Hub credentials must be configured before tag push
 - Pre-extracted binaries mean less customization flexibility
 - No eMMC on this unit - NVMe required for root filesystem
-- May need to document local imager setup for development
 
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed 03-04-PLAN.md (Phase 3 Complete - overlay)
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None
 
-**Phase status:** Phase 3 COMPLETE (overlay)
-**Next phase:** Phase 4 - Overlay Integration
-Recommended next action: Plan Phase 4 to generate Talos raw image and complete hardware validation
+**Phase status:** Phase 4 IN PROGRESS (1/2 plans complete)
+**Next plan:** 04-02 (Tag push and hardware validation)
+Recommended next action: Configure Docker Hub credentials in GitHub, then push version tag
 
 ---
 *State initialized: 2026-02-02*
-*Last updated: 2026-02-03 (after 03-04 completion - Phase 3 complete)*
+*Last updated: 2026-02-03 (after 04-01 completion)*
