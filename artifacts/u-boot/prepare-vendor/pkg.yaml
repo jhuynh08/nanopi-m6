@@ -1,0 +1,45 @@
+# FriendlyELEC vendor U-Boot source preparation
+# This stage downloads and prepares the vendor U-Boot source for NanoPi M6
+#
+# Why vendor U-Boot v2017.09:
+# - FriendlyELEC forked at v2017.09 with Rockchip vendor patches
+# - Contains proprietary idbloader generation for RK3588S
+# - Produces MiniLoaderAll format that boots on NanoPi M6
+# - Mainline U-Boot v2025.10 produces u-boot-rockchip.bin format that does NOT boot
+#
+# References:
+#   - https://github.com/FriendlyELEC/uboot-rockchip (branch: nanopi6-v2017.09)
+name: u-boot-prepare-vendor
+variant: scratch
+shell: /toolchain/bin/bash
+dependencies:
+  - stage: base
+steps:
+  - sources:
+      - url: https://github.com/FriendlyELEC/uboot-rockchip/archive/refs/heads/nanopi6-v2017.09.tar.gz
+        destination: uboot-vendor.tar.gz
+        # Note: Branch archive - no checksum pinning (branch can update)
+    prepare:
+      - |
+        mkdir -p /usr/bin \
+          && ln -sf /toolchain/bin/env /usr/bin/env \
+          && ln -sf /toolchain/bin/python3 /toolchain/bin/python
+
+        pip3 install pyelftools setuptools
+
+        tar xf uboot-vendor.tar.gz --strip-components=1
+    install:
+      - |
+        mkdir -p /src-vendor
+        cp -a . /src-vendor/
+finalize:
+  - from: /src-vendor
+    to: /src-vendor
+  - from: /toolchain
+    to: /toolchain
+  - from: /usr
+    to: /usr
+  - from: /bin
+    to: /bin
+  - from: /lib
+    to: /lib
