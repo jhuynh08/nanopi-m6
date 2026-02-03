@@ -1,68 +1,25 @@
-# FriendlyARM vendor U-Boot for NanoPi M6
+# FriendlyELEC vendor U-Boot for NanoPi M6
 #
-# IMPORTANT: This configuration is for reference only.
-# The NanoPi M6 requires vendor bootloader binaries that cannot be built
-# from source with modern toolchains.
+# Uses pre-extracted binaries from FriendlyELEC Ubuntu image.
+# Mainline U-Boot does NOT boot on NanoPi M6 (validated in Phase 2).
 #
-# The vendor U-Boot (v2017.09) requires:
-# - Legacy GCC 6.x toolchain
-# - FriendlyARM's rkbin repository
-# - Specific build environment
-#
-# For actual bootloader files, use the extraction procedure documented in:
-# docs/FRIENDLYELEC-BOOTLOADER-EXTRACTION.md
-#
-# Source image: FriendlyELEC rk3588-sd-ubuntu-noble-minimal-6.1-arm64-20251222.img
-# Files needed: idbloader.img (sector 64), uboot.img (sector 16384)
-#
-# Critical format differences:
-# | Aspect        | Mainline (BROKEN)       | Vendor (WORKING)                    |
-# |---------------|-------------------------|-------------------------------------|
-# | Output files  | u-boot-rockchip.bin     | idbloader.img + uboot.img           |
-# | Flash offset  | Single file at sector 64| Two files at sectors 64 and 16384   |
-# | DDR init      | Built-in TPL            | Rockchip proprietary idbloader      |
-# | Defconfig     | nanopi-m6-rk3588s       | nanopi6_defconfig                   |
-#
-# Flash commands:
-#   sudo dd if=idbloader.img of=/dev/rdiskN bs=512 seek=64
-#   sudo dd if=uboot.img of=/dev/rdiskN bs=512 seek=16384
-#
-# This pkg.yaml preserves the mainline U-Boot build for reference/future use
-# when upstream support improves.
+# Source: rk3588-sd-ubuntu-noble-minimal-6.1-arm64-20251222.img
 name: u-boot-nanopi-m6
 variant: scratch
 shell: /toolchain/bin/bash
 dependencies:
-  - stage: rkbin
-  - stage: u-boot-prepare
+  - stage: base
 steps:
-  - env:
-      SOURCE_DATE_EPOCH: {{ .BUILD_ARG_SOURCE_DATE_EPOCH }}
-      ROCKCHIP_TPL: /libs/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.18.bin
-      BL31: /libs/rkbin/bin/rk35/rk3588_bl31_v1.48.elf
-    prepare:
-      - |
-        cd /src
-
-        # Download NanoPi M6 defconfig from Armbian
-        curl -fsSL -o configs/nanopi-m6-rk3588s_defconfig \
-          "https://raw.githubusercontent.com/armbian/build/main/patch/u-boot/v2025.10/defconfig/nanopi-m6-rk3588s_defconfig"
-
-        # Download NanoPi M6 device tree from Armbian
-        curl -fsSL -o dts/upstream/src/arm64/rockchip/rk3588s-nanopi-m6.dts \
-          "https://raw.githubusercontent.com/armbian/build/main/patch/u-boot/v2025.10/dt_upstream_rockchip/rk3588s-nanopi-m6.dts"
-
-        make nanopi-m6-rk3588s_defconfig
-    build:
-      - |
-        cd /src
-        make -j $(nproc) HOSTLDLIBS_mkimage="-lssl -lcrypto"
-    install:
+  - install:
       - |
         mkdir -p /rootfs/artifacts/arm64/u-boot/nanopi-m6
-        # Note: This produces u-boot-rockchip.bin which does NOT boot on NanoPi M6
-        # Kept for reference; use vendor binaries for actual hardware boot
-        cp -v /src/u-boot-rockchip.bin /rootfs/artifacts/arm64/u-boot/nanopi-m6
+
+        # Copy pre-extracted vendor binaries
+        cp -v /src/artifacts/u-boot/nanopi-m6-vendor/idbloader.img /rootfs/artifacts/arm64/u-boot/nanopi-m6/
+        cp -v /src/artifacts/u-boot/nanopi-m6-vendor/uboot.img /rootfs/artifacts/arm64/u-boot/nanopi-m6/
+
+        echo "Installed vendor U-Boot:"
+        ls -la /rootfs/artifacts/arm64/u-boot/nanopi-m6/
 finalize:
   - from: /rootfs
     to: /rootfs
