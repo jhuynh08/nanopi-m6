@@ -60,45 +60,65 @@ After 5 failed attempts with no LED/network activity:
 
 ### Attempt #1
 
-**Date:** ____-__-__
-**Time:** __:__
+**Date:** 2026-02-02
+**Time:** (evening)
 
 #### Configuration
 
 | Setting | Value |
 |---------|-------|
-| Defconfig | |
-| DDR blob | |
-| BL31 version | |
-| U-Boot source | |
-| SD card | |
+| Defconfig | nanopi-r6c-rk3588s_defconfig (via rock5a pkg.yaml) |
+| DDR blob | rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin |
+| BL31 version | rk3588_bl31_v1.45.elf |
+| U-Boot source | Collabora fork (via talos-sbc-rk3588) |
+| SD card | 32GB microSD with Armbian partitions |
 
 #### Observation Timeline
 
 | Time Window | Observation | Notes |
 |-------------|-------------|-------|
-| 0-10s | LED activity? [ ] Yes [ ] No | |
-| 10-30s | LED pattern? | |
-| 30-60s | HDMI output? [ ] Yes [ ] No | |
-| 60-120s | Network ping? [ ] Yes [ ] No | |
-| 120s+ | Talosctl? [ ] Yes [ ] No | |
+| 0-10s | LED activity? [ ] Yes [x] No | SYS LED on (power only), no blink |
+| 10-30s | LED pattern? | No change, steady power LED only |
+| 30-60s | HDMI output? [ ] Yes [x] No | Monitor shows no signal |
+| 60-120s | Network ping? [ ] Yes [x] No | No DHCP lease acquired |
+| 120s+ | Talosctl? [ ] Yes [x] No | N/A - no boot |
 
 #### Result
 
 - [ ] SUCCESS: Kernel booted, indicators positive
 - [ ] PARTIAL: Some activity but incomplete boot
-- [ ] FAILURE: No activity observed
+- [x] FAILURE: No activity observed
 
 #### Observations
 
 ```
-(Describe what was observed, any patterns, error indicators)
+- SYS LED remains steady (power indicator only)
+- No LED blinking activity at any point during 2-minute observation
+- HDMI monitor reports "no signal" throughout
+- Hardware verified working: Armbian SD card boots successfully on same hardware
+- Conclusion: U-Boot configuration issue, not hardware problem
+
+Root cause analysis:
+- nanopi-r6c-rk3588s_defconfig does not work for NanoPi M6
+- Despite sharing RK3588S SoC, likely differences in:
+  - DDR timing/training parameters
+  - Pinmux configurations
+  - Board-specific initialization sequences
 ```
 
 #### Next Steps
 
 ```
-(What to try next based on this result)
+1. Extract Armbian U-Boot configuration for NanoPi M6
+   - Armbian patches/config contain M6-specific defconfig
+   - Need to analyze their u-boot patches
+
+2. Create gap closure plan (02-04) for:
+   - Armbian U-Boot source analysis
+   - M6-specific defconfig extraction or creation
+   - Apply M6-specific patches to our build
+
+3. Move to Tier 2 of iteration strategy
 ```
 
 ---
@@ -245,7 +265,7 @@ Use this table to track all attempts at a glance:
 
 | # | Date | Defconfig | DDR | BL31 | LED | HDMI | Net | Result |
 |---|------|-----------|-----|------|-----|------|-----|--------|
-| 1 | | | | | | | | |
+| 1 | 2026-02-02 | nanopi-r6c-rk3588s | v1.16 | v1.45 | No | No | No | FAIL |
 | 2 | | | | | | | | |
 | 3 | | | | | | | | |
 | 4 | | | | | | | | |
