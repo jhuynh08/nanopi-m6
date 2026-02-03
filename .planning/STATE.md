@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 2 of 6 (Bootloader Bring-up)
-Plan: 6 of 6 in current phase (BOOT FAILED - 3 attempts, blob versions suspected)
-Status: BLOCKED - Boot test #3 failed, rkbin blob versions are primary suspect
-Last activity: 2026-02-03 - Completed 02-06-PLAN.md (Mainline U-Boot v2025.10 - FAILED)
+Plan: 7 of 7 in current phase (BOOT FAILED - 4 attempts, SD card boot path suspected)
+Status: BLOCKED - Boot test #4 failed, blob versions ELIMINATED as root cause
+Last activity: 2026-02-03 - Completed 02-07-PLAN.md (rkbin blob update - FAILED)
 
 Progress: [=========...........] 45%
 
@@ -62,8 +62,11 @@ Recent decisions affecting current work:
 - [02-05]: ~~Collabora U-Boot fork (v2023.07) may lack M6 support entirely~~ CONFIRMED, switched to mainline
 - [02-06]: **Switched to mainline U-Boot v2025.10** (same as Armbian)
 - [02-06]: **U-Boot source/version is NOT the root cause** (still fails with mainline)
-- [02-06]: **Primary suspect: DDR/BL31 blob version mismatch** (v1.16/v1.45 vs Armbian v1.18/v1.48)
-- [02-06]: Secondary suspect: SD card boot path (may need eMMC boot test)
+- [02-06]: ~~Primary suspect: DDR/BL31 blob version mismatch~~ ELIMINATED by 02-07
+- [02-07]: **Updated rkbin blobs to DDR v1.18, BL31 v1.48** (matches Armbian exactly)
+- [02-07]: **Blob versions are NOT the root cause** (still fails with matching blobs)
+- [02-07]: **Primary suspect: SD card boot path or build process difference**
+- [02-07]: Build configuration now matches Armbian EXACTLY - different outcome = build/media issue
 
 ### Pending Todos
 
@@ -71,42 +74,45 @@ None.
 
 ### Blockers/Concerns
 
-**ACTIVE BLOCKER - Phase 2 (Tier 3 - Continued Investigation):**
-- Boot test #3 FAILED: Mainline U-Boot v2025.10 with native M6 defconfig does not boot
-- Identical symptoms to Attempts #1 and #2 (no LED activity, no HDMI, no network)
+**ACTIVE BLOCKER - Phase 2 (Tier 3 - All Configuration Matches Armbian):**
+- Boot test #4 FAILED: Mainline U-Boot v2025.10 with EXACT Armbian configuration does not boot
+- Identical symptoms across ALL 4 attempts (no LED activity, no HDMI, no network)
 - Failure occurs at DDR/TPL stage (before device tree parsing, before SPL)
+- **Configuration now matches Armbian exactly** - issue is NOT in config
 
-**Root Cause Analysis - Eliminated:**
+**Root Cause Analysis - Eliminated (6 hypotheses ruled out):**
 - ~~Wrong device tree~~ ELIMINATED by Attempt #2
 - ~~Wrong defconfig base (rock5a)~~ ELIMINATED by Attempt #3
 - ~~Collabora fork lacks M6 support~~ ELIMINATED by Attempt #3
 - ~~U-Boot version too old~~ ELIMINATED by Attempt #3
+- ~~DDR blob version mismatch~~ ELIMINATED by Attempt #4 (v1.18 = Armbian)
+- ~~BL31 blob version mismatch~~ ELIMINATED by Attempt #4 (v1.48 = Armbian)
 
 **Root Cause Analysis - Current Suspects:**
-1. **DDR blob version mismatch** (HIGH PROBABILITY)
-   - We use: DDR v1.16, BL31 v1.45
-   - Armbian uses: DDR v1.18, BL31 v1.48
-   - DDR training is exactly where boot appears to stall
-   - Common factor across ALL 3 failed attempts
+1. **SD card boot path not supported** (HIGH PROBABILITY)
+   - All 4 tests used SD card boot
+   - Armbian may have tested on eMMC
+   - SD card controller init may differ
+   - Need to test: Armbian's binary OR eMMC boot
 
-2. **SD card boot not supported** (MEDIUM PROBABILITY)
-   - M6 may only boot from eMMC by default
-   - Need to test eMMC boot path via MaskROM
+2. **Build process difference** (MEDIUM PROBABILITY)
+   - Different toolchain produces different binary
+   - Make flags or environment variables
+   - Need to test Armbian's exact binary for diagnosis
 
-3. **rkbin repository version** (LOW PROBABILITY)
-   - Different rkbin commit may have interdependent blob versions
+3. **Partition/boot sector layout** (LOW-MEDIUM PROBABILITY)
+   - U-Boot SPL offset or alignment issue
+   - May need to verify exact write offset
 
 **Next Steps - Choose one:**
-1. **Option A (Recommended):** Update rkbin blob versions to match Armbian (v1.18/v1.48)
-   - Pros: Directly addresses #1 suspect, low effort
-   - Cons: Requires rkbin version research
+1. **Option A (RECOMMENDED):** Test Armbian's exact u-boot-rockchip.bin
+   - Pros: Quick diagnostic (10 min), definitive answer
+   - If boots: Issue is our build process
+   - If fails: Issue is SD card boot path
 2. **Option B:** Test eMMC boot path via MaskROM
    - Pros: Rules out SD card boot as issue
    - Cons: More complex procedure
-3. **Option C:** Extract and test Armbian's exact u-boot-rockchip.bin
-   - Pros: Quick diagnostic - if it boots, issue is blob/build
-   - Cons: Not a solution, just diagnostic
-4. **Option D:** Acquire UART for detailed debugging
+3. **Option C:** Acquire UART for detailed debugging
    - Pros: Definitive diagnosis
    - Cons: Hardware purchase, time delay
 
@@ -126,12 +132,13 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed 02-06-PLAN.md (Mainline U-Boot v2025.10 - BOOT FAILED)
+Stopped at: Completed 02-07-PLAN.md (rkbin blob update - BOOT FAILED)
 Resume file: None - awaiting next investigation decision
 
-**Gap status:** OPEN - Mainline U-Boot approach failed, blob versions are new investigation target.
-Recommended next action: Update rkbin to match Armbian's DDR v1.18 and BL31 v1.48.
+**Gap status:** OPEN - All configuration now matches Armbian exactly. Still fails.
+**Key insight:** Same config, different outcome = build process or boot media issue
+Recommended next action: Test Armbian's exact u-boot-rockchip.bin to determine if issue is build process or SD card boot path.
 
 ---
 *State initialized: 2026-02-02*
-*Last updated: 2026-02-03*
+*Last updated: 2026-02-03 (after 02-07 completion)*
