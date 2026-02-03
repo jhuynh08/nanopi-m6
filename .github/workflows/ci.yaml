@@ -32,9 +32,7 @@ jobs:
       issues: read
       packages: write
       pull-requests: read
-    runs-on:
-      - self-hosted
-      - pkgs
+    runs-on: kolbe
     if: (!startsWith(github.head_ref, 'renovate/') && !startsWith(github.head_ref, 'dependabot/'))
     outputs:
       SBC_RK3588_TAG: ${{ steps.build-overlay.outputs.SBC_RK3588_TAG }}
@@ -142,7 +140,7 @@ jobs:
       packages: write
     needs: [sbc-rk3588]
     if: startsWith(github.ref, 'refs/tags/')
-    runs-on: [self-hosted]
+    runs-on: kolbe
     strategy:
       matrix:
         kernel:
@@ -247,7 +245,7 @@ jobs:
 
   release:
     needs: [boards]
-    runs-on: [self-hosted]
+    runs-on: kolbe
     if: startsWith(github.ref, 'refs/tags/')
     permissions:
       contents: write
