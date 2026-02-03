@@ -240,7 +240,8 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
-          crane auth logout ghcr.io
+          crane auth logout ghcr.io || true
+          crane auth logout docker.io || true
           # HACK: files are owned by root, (ab)use Docker as sudo
           docker run --rm -t -v ./_out:/out alpine sh -c 'rm -rf /out/*'
 
