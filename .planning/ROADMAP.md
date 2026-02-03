@@ -56,7 +56,7 @@ Plans:
 - [x] 02-05-PLAN.md - [GAP CLOSURE] Apply M6-specific config and re-test hardware (BOOT FAILED - device tree not root cause)
 - [x] 02-06-PLAN.md - [GAP CLOSURE] Switch to mainline U-Boot v2025.10 (BOOT FAILED - U-Boot version not root cause)
 - [x] 02-07-PLAN.md - [GAP CLOSURE] Update rkbin blob versions (BOOT FAILED - blob versions not root cause)
-- [ ] 02-08-PLAN.md - [GAP CLOSURE] Test Armbian bootloader binary to isolate root cause
+- [ ] 02-08-PLAN.md - [GAP CLOSURE] Test FriendlyElec vendor bootloader (v2017.09) to diagnose mainline vs vendor requirement
 
 ### Phase 3: Device Tree & Kernel
 **Goal**: Linux kernel boots with essential NanoPi M6 hardware functional
