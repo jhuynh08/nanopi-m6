@@ -820,4 +820,38 @@ Validation:
 
 ## Phase 3 Hardware Validation Log
 
-*(Validation attempts recorded below)*
+### Phase 3 Attempt #1 (Deferred)
+
+| Setting | Value |
+|---------|-------|
+| Date | 2026-02-03 |
+| Image | Talos SBC overlay (no raw image yet) |
+| Result | DEFERRED to Phase 4 |
+
+#### Status
+
+Hardware validation deferred. Rationale:
+
+1. **Overlay build successful** - All NanoPi M6 artifacts integrate correctly:
+   - Vendor DTB (rk3588s-nanopi-m6.dtb)
+   - Vendor U-Boot (idbloader.img + uboot.img)
+   - RK3588 installer with nanopi-m6 board support
+
+2. **No raw image available** - Local build produces overlay, not flashable `.raw`:
+   - Raw image generation requires CI/CD (push overlay to registry + Talos imager)
+   - FriendlyELEC Ubuntu image validation is circular (it's the official image)
+
+3. **Decision**: Defer hardware validation to Phase 4 when Talos image is generated via CI/CD
+
+#### Validation Deferred To
+
+- Phase 4: Overlay Integration - will generate actual Talos image and validate boot
+- Hardware validation will use real Talos image, not vendor Ubuntu
+
+#### What Was Validated in Phase 3
+
+- ✓ Vendor DTB committed and build-integrated
+- ✓ Vendor U-Boot committed and build-integrated
+- ✓ Installer updated for nanopi-m6 board
+- ✓ Full overlay build completes successfully
+- ○ Hardware boot test (deferred - needs Talos raw image)
