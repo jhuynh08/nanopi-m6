@@ -15,7 +15,8 @@ steps:
         mkdir -p /rootfs/dtb/rockchip
 
         # Copy NanoPi M6 vendor DTB
-        cp -v /pkg/artifacts/dtb/rockchip/rk3588s-nanopi-m6.dtb /rootfs/dtb/rockchip/
+        # /pkg is the context from artifacts/dtb, so rockchip/ is directly under /pkg
+        cp -v /pkg/rockchip/rk3588s-nanopi-m6.dtb /rootfs/dtb/rockchip/
 
         echo "Installed vendor DTBs:"
         ls -la /rootfs/dtb/rockchip/

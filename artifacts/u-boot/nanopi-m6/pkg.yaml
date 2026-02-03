@@ -15,8 +15,9 @@ steps:
         mkdir -p /rootfs/artifacts/arm64/u-boot/nanopi-m6
 
         # Copy pre-extracted vendor binaries
-        cp -v /src/artifacts/u-boot/nanopi-m6-vendor/idbloader.img /rootfs/artifacts/arm64/u-boot/nanopi-m6/
-        cp -v /src/artifacts/u-boot/nanopi-m6-vendor/uboot.img /rootfs/artifacts/arm64/u-boot/nanopi-m6/
+        # /pkg is the context from artifacts/u-boot/nanopi-m6, vendor/ is a subdirectory
+        cp -v /pkg/vendor/idbloader.img /rootfs/artifacts/arm64/u-boot/nanopi-m6/
+        cp -v /pkg/vendor/uboot.img /rootfs/artifacts/arm64/u-boot/nanopi-m6/
 
         echo "Installed vendor U-Boot:"
         ls -la /rootfs/artifacts/arm64/u-boot/nanopi-m6/
