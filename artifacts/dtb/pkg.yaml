@@ -1,0 +1,24 @@
+# Pre-extracted device tree blobs for boards requiring vendor DTBs
+#
+# NanoPi M6 uses a vendor DTB extracted from FriendlyELEC's Ubuntu image.
+# This mirrors the vendor U-Boot approach from Phase 2.
+#
+# Source: rk3588-sd-ubuntu-noble-minimal-6.1-arm64-20251222.img
+name: dtb-vendor
+variant: scratch
+shell: /toolchain/bin/bash
+dependencies:
+  - stage: base
+steps:
+  - install:
+      - |
+        mkdir -p /rootfs/dtb/rockchip
+
+        # Copy NanoPi M6 vendor DTB
+        cp -v /pkg/artifacts/dtb/rockchip/rk3588s-nanopi-m6.dtb /rootfs/dtb/rockchip/
+
+        echo "Installed vendor DTBs:"
+        ls -la /rootfs/dtb/rockchip/
+finalize:
+  - from: /rootfs
+    to: /rootfs
