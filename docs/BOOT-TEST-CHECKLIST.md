@@ -565,10 +565,103 @@ Create Plan 02-09 to investigate vendor U-Boot integration or hybrid approach.
 Phase 2 can now proceed with clear architectural direction.
 
 VERIFICATION COMPLETE:
-- 5 boot attempts total
+- 6 boot attempts total
 - 4 FAILED with mainline U-Boot (various configurations)
-- 1 SUCCESS with vendor U-Boot
+- 2 SUCCESS with vendor U-Boot (pre-built and Talos-built)
 - Root cause: Bootloader format/approach, not configuration
+```
+
+---
+
+### Attempt #6
+
+**Date:** 2026-02-03
+**Time:** ~05:38 UTC
+
+#### Configuration
+
+| Setting | Value |
+|---------|-------|
+| Defconfig | FriendlyELEC nanopi6_defconfig (Talos build) |
+| DDR blob | FriendlyELEC embedded binaries |
+| BL31 version | FriendlyELEC embedded binaries |
+| U-Boot source | FriendlyELEC vendor fork (v2017.09) via Talos bldr |
+| SD card | 32GB microSD |
+| Loader format | idbloader.img + uboot.img (Rockchip proprietary format) |
+| Boot chain | Talos-built vendor U-Boot |
+
+#### Configuration Changes from Attempt #5
+
+- **Key change:** Built vendor U-Boot through Talos bldr pipeline instead of using pre-extracted binary
+- Added FriendlyELEC uboot-rockchip source to Pkgfile
+- Created prepare-vendor stage for vendor U-Boot source
+- Updated nanopi-m6 pkg.yaml to build with nanopi6_defconfig
+- Build produces idbloader.img + uboot.img (same format as FriendlyELEC pre-built)
+- Validates that Talos build system can produce bootable NanoPi M6 bootloader
+
+#### Observation Timeline
+
+| Time Window | Observation | Notes |
+|-------------|-------------|-------|
+| 0-10s | LED activity? [x] Yes [ ] No | Boot activity observed |
+| 10-30s | LED pattern? | Boot sequence proceeding |
+| 30-60s | HDMI output? [x] Yes [ ] No | **HDMI output visible** |
+| 60-120s | Network ping? [?] TBD | Not tested |
+| 120s+ | Login screen? [x] Yes [ ] No | **BOOTED TO LOGIN SCREEN** |
+
+#### Result
+
+- [x] SUCCESS: Full boot to login screen
+- [ ] PARTIAL: Some activity but incomplete boot
+- [ ] FAILURE: No activity observed
+
+#### Observations
+
+```
+*** PHASE 2 GOAL ACHIEVED ***
+
+Talos-built vendor U-Boot successfully boots NanoPi M6 to login screen.
+This validates the complete bootloader integration approach.
+
+Key validations:
+1. Talos bldr can build vendor U-Boot from FriendlyELEC source
+2. Build produces correct idbloader.img + uboot.img format
+3. Hardware boots through full U-Boot chain to kernel
+4. HDMI output working (kernel booted successfully)
+5. Login screen visible (full system operational)
+
+Boot chain validated:
+idbloader.img (sector 64) -> uboot.img (sector 16384) -> kernel -> login
+
+This replicates and extends Attempt #5 success:
+- Attempt #5: Pre-extracted FriendlyELEC binary boots
+- Attempt #6: Talos-built vendor U-Boot boots (same result, integrated build)
+
+Phase 2 status: COMPLETE
+- Goal: "NanoPi M6 boots to U-Boot"
+- Achieved: NanoPi M6 boots to login screen (exceeds goal)
+```
+
+#### Next Steps
+
+```
+PHASE 2 COMPLETE - Ready for Phase 3
+
+Boot test verification complete:
+- 6 boot attempts total
+- 4 FAILED with mainline U-Boot
+- 2 SUCCESS with vendor U-Boot (pre-built and Talos-built)
+
+Architectural decision validated:
+- NanoPi M6 requires vendor U-Boot (MiniLoaderAll format)
+- Talos build system successfully produces bootable bootloader
+- Ready to proceed with Phase 3: Device Tree & Kernel configuration
+
+Remaining work for full Talos image:
+- Phase 3: Device tree and kernel configuration
+- Phase 4: Talos integration (SBC profile, omnictl)
+- Phase 5: CI/CD automation
+- Phase 6: Documentation and release
 ```
 
 ---
@@ -630,6 +723,7 @@ Use this table to track all attempts at a glance:
 | 3 | 2026-02-03 | nanopi-m6-rk3588s (mainline v2025.10) | v1.16 | v1.45 | No | No | No | FAIL |
 | 4 | 2026-02-03 | nanopi-m6-rk3588s (mainline v2025.10) | v1.18 | v1.48 | No | No | No | FAIL |
 | 5 | 2026-02-03 | FriendlyELEC vendor (pre-built) | vendor | vendor | Yes | TBD | TBD | **SUCCESS** |
+| 6 | 2026-02-03 | Talos build (vendor U-Boot) | vendor | vendor | Yes | Yes | - | **SUCCESS** |
 
 ---
 
