@@ -153,11 +153,14 @@ jobs:
             chipset: rk3588s
           - name: rock-5b
             chipset: rk3588
+          - name: nanopi-m6
+            chipset: rk3588s
+            registry: dockerhub
     env:
       SBC_RK3588_TAG: ${{ needs.sbc-rk3588.outputs.SBC_RK3588_TAG }}
     steps:
-      - name: Build installer image
-        if: github.event_name != 'pull_request'
+      - name: Build installer image (GHCR boards)
+        if: github.event_name != 'pull_request' && matrix.board.registry != 'dockerhub'
         run: |
           docker run --rm -t -v ./_out:/out -v /dev:/dev --privileged ghcr.io/${{ env.USERNAME }}/imager:${{ env.SBC_RK3588_TAG }}-${{ matrix.kernel }} \
             installer --arch arm64 \
@@ -170,14 +173,34 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Push installer image
-        if: github.event_name != 'pull_request'
+      - name: Build installer image (Docker Hub boards)
+        if: github.event_name != 'pull_request' && matrix.board.registry == 'dockerhub'
+        run: |
+          docker run --rm -t -v ./_out:/out -v /dev:/dev --privileged ghcr.io/${{ env.USERNAME }}/imager:${{ env.SBC_RK3588_TAG }}-${{ matrix.kernel }} \
+            installer --arch arm64 \
+              --base-installer-image="ghcr.io/siderolabs/installer:${{ env.TALOS_VERSION }}" \
+              --overlay-name=rk3588 \
+              --overlay-image=docker.io/${{ vars.DOCKERHUB_USERNAME }}/talos-sbc-nanopi-m6:${{ env.SBC_RK3588_TAG }} \
+              --overlay-option="board=${{ matrix.board.name }}" \
+              --overlay-option="chipset=${{ matrix.board.chipset }}" \
+              --system-extension-image="${{ env.REALKTEK_FIRMWARE_EXTENSION_IMAGE }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push installer image (GHCR)
+        if: github.event_name != 'pull_request' && matrix.board.registry != 'dockerhub'
         run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | crane auth login ghcr.io --username "${{ env.USERNAME }}" --password-stdin
           crane push _out/installer-arm64.tar ghcr.io/${{ env.USERNAME }}/talos-rk3588:${{ env.SBC_RK3588_TAG }}-${{ matrix.board.name }}-${{ matrix.kernel }}
 
-      - name: Build flashable image
-        if: startsWith(github.ref, 'refs/tags/')
+      - name: Push installer image (Docker Hub)
+        if: github.event_name != 'pull_request' && matrix.board.registry == 'dockerhub'
+        run: |
+          echo "${{ secrets.DOCKERHUB_TOKEN }}" | crane auth login docker.io --username "${{ vars.DOCKERHUB_USERNAME }}" --password-stdin
+          crane push _out/installer-arm64.tar docker.io/${{ vars.DOCKERHUB_USERNAME }}/talos-sbc-nanopi-m6:${{ env.SBC_RK3588_TAG }}-${{ matrix.kernel }}
+
+      - name: Build flashable image (GHCR boards)
+        if: startsWith(github.ref, 'refs/tags/') && matrix.board.registry != 'dockerhub'
         run: |
           docker run --rm -t -v ./_out:/out -v /dev:/dev --privileged ghcr.io/${{ env.USERNAME }}/imager:${{ env.SBC_RK3588_TAG }}-${{ matrix.kernel }} \
           metal --arch arm64 \
@@ -186,6 +209,19 @@ jobs:
             --overlay-option="board=${{ matrix.board.name }}" \
             --overlay-option="chipset=${{ matrix.board.chipset }}" \
             --base-installer-image="ghcr.io/${{ env.USERNAME }}/talos-rk3588:${{ env.SBC_RK3588_TAG }}-${{ matrix.board.name }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build flashable image (Docker Hub boards)
+        if: startsWith(github.ref, 'refs/tags/') && matrix.board.registry == 'dockerhub'
+        run: |
+          docker run --rm -t -v ./_out:/out -v /dev:/dev --privileged ghcr.io/${{ env.USERNAME }}/imager:${{ env.SBC_RK3588_TAG }}-${{ matrix.kernel }} \
+          metal --arch arm64 \
+            --overlay-image=docker.io/${{ vars.DOCKERHUB_USERNAME }}/talos-sbc-nanopi-m6:${{ env.SBC_RK3588_TAG }} \
+            --overlay-name=rk3588 \
+            --overlay-option="board=${{ matrix.board.name }}" \
+            --overlay-option="chipset=${{ matrix.board.chipset }}" \
+            --base-installer-image="docker.io/${{ vars.DOCKERHUB_USERNAME }}/talos-sbc-nanopi-m6:${{ env.SBC_RK3588_TAG }}-${{ matrix.kernel }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
