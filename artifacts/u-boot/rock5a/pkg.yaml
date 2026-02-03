@@ -7,8 +7,8 @@ dependencies:
 steps:
   - env:
       SOURCE_DATE_EPOCH: {{ .BUILD_ARG_SOURCE_DATE_EPOCH }}
-      ROCKCHIP_TPL: /libs/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin
-      BL31: /libs/rkbin/bin/rk35/rk3588_bl31_v1.45.elf
+      ROCKCHIP_TPL: /libs/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.18.bin
+      BL31: /libs/rkbin/bin/rk35/rk3588_bl31_v1.48.elf
       CFLAGS: "-DCONFIG_LOG=y -DCONFIG_LOG_CONSOLE=y -DCONFIG_LOG_MAX_LEVEL=9"
     prepare:
       - |
