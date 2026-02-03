@@ -7,9 +7,9 @@ dependencies:
 steps:
   - env:
       SOURCE_DATE_EPOCH: {{ .BUILD_ARG_SOURCE_DATE_EPOCH }}
-      ROCKCHIP_TPL: /libs/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin
-      BL31: /libs/rkbin/bin/rk35/rk3588_bl31_v1.45.elf
-      # Debug logging for boot troubleshooting (can be removed once boot works)
+      ROCKCHIP_TPL: /libs/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.18.bin
+      BL31: /libs/rkbin/bin/rk35/rk3588_bl31_v1.48.elf
+      # Attempt #4: Updated blobs to match Armbian (DDR v1.18, BL31 v1.48)
       CFLAGS: "-DCONFIG_LOG=y -DCONFIG_LOG_CONSOLE=y -DCONFIG_LOG_MAX_LEVEL=9"
     prepare:
       - |
