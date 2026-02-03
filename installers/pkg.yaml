@@ -9,6 +9,8 @@ dependencies:
     platform: linux/arm64
   - stage: talos-kernel-rk3588-{{ .BUILD_ARG_KERNEL_VARIANT }}
     platform: linux/arm64
+  - stage: dtb-vendor
+    platform: linux/arm64
   - stage: profiles
 steps:
   - prepare:

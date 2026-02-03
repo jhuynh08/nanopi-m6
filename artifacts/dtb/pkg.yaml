@@ -21,4 +21,4 @@ steps:
         ls -la /rootfs/dtb/rockchip/
 finalize:
   - from: /rootfs
-    to: /rootfs
+    to: /
