@@ -728,3 +728,96 @@ Use this table to track all attempts at a glance:
 ---
 
 *Related: [MaskROM Recovery](MASKROM-RECOVERY.md) | [Flash Workflow](FLASH-WORKFLOW.md)*
+
+---
+
+## Phase 3: Kernel & Driver Validation
+
+This section validates that essential hardware drivers work correctly with the kernel and device tree.
+
+### Pre-boot Checklist
+
+- [ ] SD card from Plan 03-03 inserted (or FriendlyELEC Ubuntu for validation)
+- [ ] HDMI monitor connected
+- [ ] USB keyboard connected (optional but helpful)
+- [ ] NVMe drive installed in M.2 slot
+- [ ] Ethernet cable connected
+
+### Boot Validation Steps
+
+#### 1. Kernel Boot
+
+Expected: Kernel boots, dmesg scrolls on HDMI
+
+- [ ] Power on device
+- [ ] Wait for boot messages on HDMI
+- [ ] Kernel version visible in early dmesg
+
+#### 2. Device Tree Identification
+
+Command:
+```bash
+cat /proc/device-tree/model
+```
+
+Expected: "FriendlyElec NanoPi M6"
+
+- [ ] Board model correctly identified
+
+#### 3. Ethernet (CRITICAL - Priority 1)
+
+Commands:
+```bash
+ip link show
+dmesg | grep -i stmmac
+dmesg | grep -i eth
+```
+
+Expected:
+- eth0 interface visible
+- stmmac driver loaded
+- Link LED on (if cable connected)
+
+Validation:
+- [ ] Ethernet interface exists
+- [ ] GMAC driver loaded
+
+#### 4. USB Host (Priority 2)
+
+Commands:
+```bash
+lsusb
+dmesg | grep -i usb
+dmesg | grep -i xhci
+```
+
+Expected:
+- USB hub(s) visible
+- Connected devices enumerate
+
+Validation:
+- [ ] USB controller initialized
+- [ ] Devices enumerate
+
+#### 5. NVMe Storage (CRITICAL - Priority 3)
+
+Commands:
+```bash
+lsblk
+dmesg | grep -i nvme
+dmesg | grep -i pcie
+```
+
+Expected:
+- nvme0n1 device visible
+- PCIe link established
+
+Validation:
+- [ ] NVMe device detected
+- [ ] PCIe controller working
+
+---
+
+## Phase 3 Hardware Validation Log
+
+*(Validation attempts recorded below)*
