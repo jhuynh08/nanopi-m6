@@ -8,12 +8,12 @@ vars:
   uboot_sha256: 5414ee86562abc5ed524c6dc5e092511ad281441020a88e7027de6e83fd16116
   uboot_sha512: 8a1826c14e26d7a86da91d771f7629bce866cb0b77d5acbd14f2e35b7a0fe556928caecd420659b77f0f59414c492198b7f5aa8a27161fb26a45079a8aad5fec
 
-  # FriendlyELEC vendor U-Boot for NanoPi M6
+  # FriendlyARM vendor U-Boot for NanoPi M6
   # Required because mainline u-boot-rockchip.bin format does not boot on NanoPi M6
-  # Source: https://github.com/FriendlyELEC/uboot-rockchip
+  # Source: https://github.com/friendlyarm/uboot-rockchip
   # Branch: nanopi6-v2017.09
-  friendlyelec_uboot_ref: nanopi6-v2017.09
-  friendlyelec_uboot_repo: https://github.com/FriendlyELEC/uboot-rockchip
+  friendlyarm_uboot_ref: nanopi6-v2017.09
+  friendlyarm_uboot_repo: https://github.com/friendlyarm/uboot-rockchip
 
   # renovate: datasource=git-refs versioning=git depName=https://github.com/rockchip/rkbin
   # Updated to match Armbian blob versions: DDR v1.18, BL31 v1.48

@@ -1,14 +1,21 @@
-# FriendlyELEC vendor U-Boot source preparation
+# FriendlyARM vendor U-Boot source preparation
 # This stage downloads and prepares the vendor U-Boot source for NanoPi M6
 #
+# NOTE: This stage is provided for completeness but DOES NOT BUILD with modern toolchains.
+# The vendor U-Boot v2017.09 requires legacy GCC 6.x which is not available in the
+# standard bldr toolchain. Build fails with __BYTE_ORDER redefinition error.
+#
+# For actual bootloader files, extract from FriendlyELEC official images:
+# See docs/FRIENDLYELEC-BOOTLOADER-EXTRACTION.md
+#
 # Why vendor U-Boot v2017.09:
-# - FriendlyELEC forked at v2017.09 with Rockchip vendor patches
+# - FriendlyARM forked at v2017.09 with Rockchip vendor patches
 # - Contains proprietary idbloader generation for RK3588S
 # - Produces MiniLoaderAll format that boots on NanoPi M6
 # - Mainline U-Boot v2025.10 produces u-boot-rockchip.bin format that does NOT boot
 #
 # References:
-#   - https://github.com/FriendlyELEC/uboot-rockchip (branch: nanopi6-v2017.09)
+#   - https://github.com/friendlyarm/uboot-rockchip (branch: nanopi6-v2017.09)
 name: u-boot-prepare-vendor
 variant: scratch
 shell: /toolchain/bin/bash
@@ -16,9 +23,10 @@ dependencies:
   - stage: base
 steps:
   - sources:
-      - url: https://github.com/FriendlyELEC/uboot-rockchip/archive/refs/heads/nanopi6-v2017.09.tar.gz
+      - url: https://github.com/friendlyarm/uboot-rockchip/archive/refs/heads/nanopi6-v2017.09.tar.gz
         destination: uboot-vendor.tar.gz
-        # Note: Branch archive - no checksum pinning (branch can update)
+        sha256: "279f5df2d5d44f7fdbdd5cc4042da18f15fb059e2557967da08686f8df0919e0"
+        sha512: "7f08b9cd93bd01b11b30be52c47eeb4c932c747c069331ba994942a2770fd9ed4592f68a1e80e0e8045401bbefd8424749d3c052bc399d6063a35d9667bf53c1"
     prepare:
       - |
         mkdir -p /usr/bin \
