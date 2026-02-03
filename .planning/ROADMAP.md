@@ -46,14 +46,15 @@ Plans:
   2. DDR memory initializes (LPDDR5 blob loads correctly)
   3. Boot activity observable (LED blink or eventual kernel HDMI output)
   4. Recovery procedure documented and tested (MaskROM mode)
-**Plans**: 5 plans in 3 waves (includes 2 gap closure plans)
+**Plans**: 6 plans in 3 waves (includes 3 gap closure plans)
 
 Plans:
 - [x] 02-01-PLAN.md - Create U-Boot build configuration for NanoPi M6
 - [x] 02-02-PLAN.md - Create recovery and iteration documentation
 - [x] 02-03-PLAN.md - Build U-Boot and verify boot on hardware (BOOT FAILED - rock5a defconfig insufficient)
-- [ ] 02-04-PLAN.md - [GAP CLOSURE] Extract Armbian NanoPi M6 U-Boot configuration
-- [ ] 02-05-PLAN.md - [GAP CLOSURE] Apply M6-specific config and re-test hardware
+- [x] 02-04-PLAN.md - [GAP CLOSURE] Extract Armbian NanoPi M6 U-Boot configuration
+- [x] 02-05-PLAN.md - [GAP CLOSURE] Apply M6-specific config and re-test hardware (BOOT FAILED - device tree not root cause)
+- [ ] 02-06-PLAN.md - [GAP CLOSURE] Switch to mainline U-Boot v2025.10
 
 ### Phase 3: Device Tree & Kernel
 **Goal**: Linux kernel boots with essential NanoPi M6 hardware functional
@@ -130,7 +131,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Environment Setup | 3/3 | Complete | 2026-02-02 |
-| 2. Bootloader Bring-Up | 3/5 | Gap closure in progress | - |
+| 2. Bootloader Bring-Up | 5/6 | Gap closure in progress | - |
 | 3. Device Tree & Kernel | 0/3 | Not started | - |
 | 4. Overlay Integration | 0/3 | Not started | - |
 | 5. Cluster Integration | 0/4 | Not started | - |
@@ -138,4 +139,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-02 (Phase 2 gap closure plans added)*
+*Last updated: 2026-02-03 (Phase 2 plan 06 added - mainline U-Boot switch)*
