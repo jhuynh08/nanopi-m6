@@ -125,45 +125,91 @@ Root cause analysis:
 
 ### Attempt #2
 
-**Date:** ____-__-__
-**Time:** __:__
+**Date:** 2026-02-03
+**Time:** ~01:30 UTC
 
 #### Configuration
 
 | Setting | Value |
 |---------|-------|
-| Defconfig | |
-| DDR blob | |
-| BL31 version | |
-| U-Boot source | |
-| SD card | |
+| Defconfig | rock5a-rk3588s_defconfig (patched for M6 device tree) |
+| DDR blob | rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin |
+| BL31 version | rk3588_bl31_v1.45.elf |
+| U-Boot source | Collabora fork (via talos-sbc-rk3588) |
+| SD card | 32GB microSD with Armbian partitions |
+| Custom DTS | rk3588s-nanopi-m6.dts (minimal, Collabora-compatible) |
+
+#### Configuration Changes from Attempt #1
+
+- Created custom `rk3588s-nanopi-m6.dts` (minimal, compatible with Collabora U-Boot)
+- Key device tree changes: LED GPIOs (GPIO1_A4/A6), tx_delay (0x42), SD card GPIO
+- Patched `.config` to change `CONFIG_DEFAULT_DEVICE_TREE` from rock5a to nanopi-m6
+- Patched `.config` to change `CONFIG_OF_LIST` for binman FIT image
+- Patched `.config` to change `CONFIG_DEFAULT_FDT_FILE` for kernel boot
+- Build succeeded: 9.35MB u-boot-rockchip.bin produced
 
 #### Observation Timeline
 
 | Time Window | Observation | Notes |
 |-------------|-------------|-------|
-| 0-10s | LED activity? [ ] Yes [ ] No | |
-| 10-30s | LED pattern? | |
-| 30-60s | HDMI output? [ ] Yes [ ] No | |
-| 60-120s | Network ping? [ ] Yes [ ] No | |
-| 120s+ | Talosctl? [ ] Yes [ ] No | |
+| 0-10s | LED activity? [ ] Yes [x] No | SYS LED on (power only), no blink |
+| 10-30s | LED pattern? | No change, steady power LED only |
+| 30-60s | HDMI output? [ ] Yes [x] No | Monitor shows no signal |
+| 60-120s | Network ping? [ ] Yes [x] No | No DHCP lease acquired |
+| 120s+ | Talosctl? [ ] Yes [x] No | N/A - no boot |
 
 #### Result
 
 - [ ] SUCCESS: Kernel booted, indicators positive
 - [ ] PARTIAL: Some activity but incomplete boot
-- [ ] FAILURE: No activity observed
+- [x] FAILURE: No activity observed
 
 #### Observations
 
 ```
-(Describe what was observed, any patterns, error indicators)
+- IDENTICAL symptoms to Attempt #1 - no improvement
+- SYS LED remains steady (power indicator only)
+- No LED blinking activity at any point during 2-minute observation
+- HDMI monitor reports "no signal" throughout
+- No network activity detected
+
+Critical finding: Device tree was NOT the root cause
+- The custom M6 device tree with correct LED/GPIO/ethernet settings did not fix boot
+- Same early-stage failure as with rock5a device tree
+- Failure occurs BEFORE device tree is even parsed (DDR/SPL stage)
+
+Root cause analysis revision:
+- Device tree differences (LED GPIOs, tx_delay, etc.) are NOT the issue
+- Problem is in earlier boot stage: DDR training or SPL initialization
+- rock5a-rk3588s_defconfig has incompatibilities beyond just device tree
+- Need to investigate: SPL config, DDR timing, PMIC init sequence, board target
 ```
 
 #### Next Steps
 
 ```
-(What to try next based on this result)
+1. Armbian uses completely different defconfig (nanopi-m6-rk3588s_defconfig)
+   - Cannot simply patch rock5a defconfig - fundamental incompatibilities
+   - Need to use Armbian's actual defconfig, not modify rock5a
+
+2. Armbian uses mainline U-Boot v2025.10
+   - Collabora fork is based on v2023.07-rc4
+   - Version gap may explain missing M6 support
+   - Consider: Update to mainline U-Boot or newer Collabora fork
+
+3. Potential causes requiring investigation:
+   - CONFIG_TARGET_ROCK5A_RK3588 vs CONFIG_TARGET_EVB_RK3588
+   - SPL initialization differences
+   - DDR timing parameters (not in defconfig, may be in rkbin blobs)
+   - PMIC initialization (RK806 via SPI2 on M6)
+
+4. Options for next iteration:
+   a. Switch to mainline U-Boot v2025.10 (breaking change)
+   b. Apply Armbian U-Boot patches to Collabora fork
+   c. Extract working u-boot-rockchip.bin from Armbian and test directly
+   d. Acquire UART for detailed boot log analysis
+
+5. Move to Tier 3 consideration - UART may be necessary
 ```
 
 ---
@@ -266,7 +312,7 @@ Use this table to track all attempts at a glance:
 | # | Date | Defconfig | DDR | BL31 | LED | HDMI | Net | Result |
 |---|------|-----------|-----|------|-----|------|-----|--------|
 | 1 | 2026-02-02 | nanopi-r6c-rk3588s | v1.16 | v1.45 | No | No | No | FAIL |
-| 2 | | | | | | | | |
+| 2 | 2026-02-03 | rock5a + M6 DTS patch | v1.16 | v1.45 | No | No | No | FAIL |
 | 3 | | | | | | | | |
 | 4 | | | | | | | | |
 | 5 | | | | | | | | |
