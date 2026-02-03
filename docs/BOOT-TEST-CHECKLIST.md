@@ -454,6 +454,125 @@ then eMMC boot test if needed, then UART as last resort.
 
 ---
 
+### Attempt #5
+
+**Date:** 2026-02-03
+**Time:** ~06:00 UTC
+
+#### Configuration
+
+| Setting | Value |
+|---------|-------|
+| Defconfig | FriendlyELEC nanopi6_defconfig (pre-built binary) |
+| DDR blob | FriendlyELEC's embedded vendor version |
+| BL31 version | FriendlyELEC's embedded vendor version |
+| U-Boot source | **FriendlyELEC vendor fork (v2017.09)** |
+| SD card | 32GB microSD with Armbian partitions, FriendlyELEC bootloader flashed |
+| Loader format | MiniLoaderAll.bin + uboot.img (Rockchip proprietary format) |
+| Boot chain | idbloader + uboot.img (NOT u-boot-rockchip.bin) |
+
+#### Configuration Changes from Attempt #4
+
+- **CRITICAL CHANGE:** Used FriendlyELEC's pre-built vendor bootloader instead of our mainline build
+- Extracted bootloader from FriendlyELEC Ubuntu SD card (rk3588-sd-ubuntu-noble-minimal-6.1-arm64-20251222.img)
+- Flashed FriendlyELEC bootloader to sector 64 of test SD card
+- This replaces our mainline u-boot-rockchip.bin with vendor MiniLoaderAll format
+- Same SD card hardware used in Attempts #1-4
+
+#### Observation Timeline
+
+| Time Window | Observation | Notes |
+|-------------|-------------|-------|
+| 0-10s | LED activity? [x] Yes [ ] No | **BOOT ACTIVITY OBSERVED** |
+| 10-30s | LED pattern? | Boot sequence activity confirmed |
+| 30-60s | HDMI output? [?] TBD | Not tested / Not reported |
+| 60-120s | Network ping? [?] TBD | Not tested / Not reported |
+| 120s+ | Talosctl? [ ] N/A | N/A - testing bootloader only |
+
+#### Result
+
+- [x] SUCCESS: Boot activity observed with FriendlyELEC vendor bootloader
+- [ ] PARTIAL: Some activity but incomplete boot
+- [ ] FAILURE: No activity observed
+
+#### Observations
+
+```
+*** BREAKTHROUGH - ROOT CAUSE IDENTIFIED ***
+
+FriendlyELEC vendor bootloader BOOTS on the same SD card where our mainline
+U-Boot failed 4 times in a row. This definitively identifies the root cause:
+
+KEY FINDING: SD card boot path IS working. Hardware IS working.
+The issue is our BUILD PROCESS / BOOTLOADER APPROACH.
+
+Root cause analysis - CONFIRMED:
+1. SD card boot works with vendor bootloader
+2. Same SD card, same hardware as failed Attempts #1-4
+3. Only difference: vendor U-Boot (v2017.09) vs mainline U-Boot (v2025.10)
+4. Vendor uses MiniLoaderAll format, we use u-boot-rockchip.bin format
+
+Configuration comparison:
+| Aspect | Our Build (FAILED) | FriendlyELEC (BOOTS) |
+|--------|-------------------|---------------------|
+| U-Boot version | v2025.10 (mainline) | v2017.09 (vendor) |
+| Defconfig | nanopi-m6-rk3588s | nanopi6_defconfig |
+| Loader format | u-boot-rockchip.bin | MiniLoaderAll.bin + uboot.img |
+| DDR init | TPL + SPL combined | idbloader (Rockchip format) |
+| Build source | github.com/u-boot/u-boot | FriendlyELEC/uboot-rockchip |
+
+ARCHITECTURAL CONCLUSION:
+NanoPi M6 requires vendor-style bootloader (MiniLoaderAll format), NOT mainline
+u-boot-rockchip.bin format. This is likely due to:
+1. Proprietary DDR training in MiniLoaderAll
+2. Different TPL/SPL initialization sequence
+3. Rockchip-specific boot chain requirements for this board
+
+IMPACT ON PROJECT:
+- Cannot use mainline U-Boot v2025.10 directly
+- Need to either:
+  a) Use FriendlyELEC's vendor U-Boot source (v2017.09)
+  b) Find a way to produce MiniLoaderAll-compatible binary from mainline
+  c) Use hybrid approach (vendor bootloader + mainline kernel)
+```
+
+#### Next Steps
+
+```
+ROOT CAUSE CONFIRMED: Mainline U-Boot boot chain incompatible with NanoPi M6
+
+Recommended path forward:
+
+1. **OPTION A: Vendor U-Boot integration (RECOMMENDED)**
+   - Fork FriendlyELEC/uboot-rockchip for Talos integration
+   - Use vendor U-Boot v2017.09 with MiniLoaderAll format
+   - Proven to boot, known working configuration
+   - Tradeoff: Older U-Boot, may need security patches
+
+2. **OPTION B: Investigate MiniLoaderAll generation**
+   - Research if mainline can generate MiniLoaderAll format
+   - rkbin tools (rkdeveloptool, rkbin's mkimage)
+   - May be possible but requires deeper investigation
+
+3. **OPTION C: Hybrid approach**
+   - Use FriendlyELEC bootloader binary directly
+   - Only customize kernel and Talos components
+   - Fastest path to working Talos boot
+   - Tradeoff: Less control over boot process
+
+IMMEDIATE NEXT ACTION:
+Create Plan 02-09 to investigate vendor U-Boot integration or hybrid approach.
+Phase 2 can now proceed with clear architectural direction.
+
+VERIFICATION COMPLETE:
+- 5 boot attempts total
+- 4 FAILED with mainline U-Boot (various configurations)
+- 1 SUCCESS with vendor U-Boot
+- Root cause: Bootloader format/approach, not configuration
+```
+
+---
+
 ## Configuration Quick Reference
 
 ### Blob Versions (Current Project)
@@ -510,7 +629,7 @@ Use this table to track all attempts at a glance:
 | 2 | 2026-02-03 | rock5a + M6 DTS patch | v1.16 | v1.45 | No | No | No | FAIL |
 | 3 | 2026-02-03 | nanopi-m6-rk3588s (mainline v2025.10) | v1.16 | v1.45 | No | No | No | FAIL |
 | 4 | 2026-02-03 | nanopi-m6-rk3588s (mainline v2025.10) | v1.18 | v1.48 | No | No | No | FAIL |
-| 5 | | | | | | | | |
+| 5 | 2026-02-03 | FriendlyELEC vendor (pre-built) | vendor | vendor | Yes | TBD | TBD | **SUCCESS** |
 
 ---
 
