@@ -21,6 +21,8 @@ env:
   USERNAME: ${{ github.repository_owner }}
   TALOS_VERSION: v1.10.6
   REALKTEK_FIRMWARE_EXTENSION_IMAGE: ghcr.io/siderolabs/realtek-firmware:20240513@sha256:4ca40c2836c1cdb5105456186afd880925d72e81ee6b0ff69a40c9c05b7b74a4
+  DOCKERHUB_USERNAME: ${{ vars.DOCKERHUB_USERNAME }}
+  DOCKERHUB_REGISTRY: docker.io
 
 jobs:
   sbc-rk3588:
@@ -76,6 +78,13 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
           username: ${{ env.USERNAME }}
+      - name: Login to Docker Hub
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: docker.io
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: checkout
         uses: actions/checkout@v4
         with:
@@ -89,6 +98,10 @@ jobs:
         if: github.event_name != 'pull_request'
         run: |
           make PUSH=true talos-kernel-rk3588-${{ matrix.kernel }} talos-sbc-rk3588-${{ matrix.kernel }}
+      - name: Push RK3588 overlay to Docker Hub (for nanopi-m6)
+        if: github.event_name != 'pull_request'
+        run: |
+          crane push _out/talos-sbc-rk3588-${{ matrix.kernel }}.tar docker.io/${{ vars.DOCKERHUB_USERNAME }}/talos-sbc-nanopi-m6:${{ steps.build-overlay.outputs.SBC_RK3588_TAG }}
       - name: Checkout upstream Talos repo
         uses: actions/checkout@v4
         with:
