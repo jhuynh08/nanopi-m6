@@ -216,45 +216,108 @@ Root cause analysis revision:
 
 ### Attempt #3
 
-**Date:** ____-__-__
-**Time:** __:__
+**Date:** 2026-02-03
+**Time:** ~02:30 UTC
 
 #### Configuration
 
 | Setting | Value |
 |---------|-------|
-| Defconfig | |
-| DDR blob | |
-| BL31 version | |
-| U-Boot source | |
-| SD card | |
+| Defconfig | nanopi-m6-rk3588s_defconfig (native mainline) |
+| DDR blob | rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin |
+| BL31 version | rk3588_bl31_v1.45.elf |
+| U-Boot source | **Mainline U-Boot v2025.10** (switched from Collabora) |
+| SD card | 32GB microSD with Armbian partitions |
+
+#### Configuration Changes from Attempt #2
+
+- **Major change:** Switched from Collabora U-Boot fork (v2023.07-rc4) to **mainline U-Boot v2025.10**
+- Now using native `nanopi-m6-rk3588s_defconfig` (exists in mainline v2025.10)
+- Using native `rk3588s-nanopi-m6.dts` from mainline (not custom/patched)
+- No defconfig patching or device tree hacks needed
+- Same U-Boot version and defconfig as Armbian uses
+- Build succeeded: u-boot-rockchip.bin produced successfully
 
 #### Observation Timeline
 
 | Time Window | Observation | Notes |
 |-------------|-------------|-------|
-| 0-10s | LED activity? [ ] Yes [ ] No | |
-| 10-30s | LED pattern? | |
-| 30-60s | HDMI output? [ ] Yes [ ] No | |
-| 60-120s | Network ping? [ ] Yes [ ] No | |
-| 120s+ | Talosctl? [ ] Yes [ ] No | |
+| 0-10s | LED activity? [ ] Yes [x] No | SYS LED solid ON (power only), no blink |
+| 10-30s | LED pattern? | No change, steady power LED only |
+| 30-60s | HDMI output? [ ] Yes [x] No | Monitor shows no signal |
+| 60-120s | Network ping? [ ] Yes [x] No | No DHCP lease acquired |
+| 120s+ | Talosctl? [ ] Yes [x] No | N/A - no boot |
 
 #### Result
 
 - [ ] SUCCESS: Kernel booted, indicators positive
 - [ ] PARTIAL: Some activity but incomplete boot
-- [ ] FAILURE: No activity observed
+- [x] FAILURE: No activity observed
 
 #### Observations
 
 ```
-(Describe what was observed, any patterns, error indicators)
+- IDENTICAL symptoms to Attempts #1 and #2 - no improvement
+- SYS LED remains solid ON (power indicator only), LED1 shows no activity
+- No LED blinking activity at any point during observation
+- HDMI monitor reports "no signal" throughout
+- No network activity detected
+
+Critical finding: U-Boot source/version is NOT the root cause
+- Mainline U-Boot v2025.10 with native M6 defconfig STILL does not boot
+- This is the exact same U-Boot version and defconfig Armbian uses successfully
+- Same early-stage failure as Attempts #1 and #2 (before device tree parsing)
+
+Root cause analysis - eliminated causes:
+1. ❌ Wrong device tree - Attempt #2 proved DTS is not the issue
+2. ❌ Wrong defconfig base (rock5a vs M6) - Attempt #3 uses native M6 defconfig
+3. ❌ Collabora fork lacks M6 support - Attempt #3 uses mainline with full support
+
+Remaining potential causes:
+1. DDR blob version mismatch:
+   - We use: v1.16
+   - Armbian uses: v1.18
+   - DDR training may fail with older blob on this specific LPDDR5 chip
+
+2. BL31 blob version mismatch:
+   - We use: v1.45
+   - Armbian uses: v1.48
+   - Earlier BL31 may have RK3588S-specific issues
+
+3. rkbin repository version:
+   - Our rkbin may be from different commit than Armbian's
+   - Blob interdependencies may require matched versions
+
+4. SD card boot not supported on M6:
+   - NanoPi M6 may only support eMMC boot by default
+   - May need specific boot strapping or fuse configuration
+
+5. Hardware issue with this specific board:
+   - Though unlikely since Armbian boots successfully
+   - Could be SD card reader hardware difference vs eMMC path
 ```
 
 #### Next Steps
 
 ```
-(What to try next based on this result)
+1. Update DDR/BL31 blob versions to match Armbian:
+   - Update rkbin to get v1.18 DDR and v1.48 BL31
+   - Test if newer blobs fix boot
+
+2. Test eMMC boot instead of SD card:
+   - Flash U-Boot to eMMC via MaskROM mode
+   - Rule out SD card boot path as issue
+
+3. Extract and test Armbian's exact u-boot-rockchip.bin:
+   - If Armbian's binary boots, issue is in our build process
+   - If Armbian's binary also fails, issue is SD card boot path
+
+4. Acquire UART for detailed debugging:
+   - See exact failure point in boot log
+   - Definitive diagnosis possible with serial console
+
+RECOMMENDATION: Try blob version update first (lowest effort),
+then eMMC boot test, then UART as last resort.
 ```
 
 ---
@@ -313,7 +376,7 @@ Use this table to track all attempts at a glance:
 |---|------|-----------|-----|------|-----|------|-----|--------|
 | 1 | 2026-02-02 | nanopi-r6c-rk3588s | v1.16 | v1.45 | No | No | No | FAIL |
 | 2 | 2026-02-03 | rock5a + M6 DTS patch | v1.16 | v1.45 | No | No | No | FAIL |
-| 3 | | | | | | | | |
+| 3 | 2026-02-03 | nanopi-m6-rk3588s (mainline v2025.10) | v1.16 | v1.45 | No | No | No | FAIL |
 | 4 | | | | | | | | |
 | 5 | | | | | | | | |
 

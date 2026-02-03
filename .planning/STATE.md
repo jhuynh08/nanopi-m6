@@ -10,29 +10,29 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 2 of 6 (Bootloader Bring-up)
-Plan: 5 of 5 in current phase (BOOT FAILED - Tier 3 decision needed)
-Status: BLOCKED - Boot test failed, device tree approach insufficient
-Last activity: 2026-02-03 - Completed 02-05-PLAN.md (Apply M6 Config - FAILED)
+Plan: 6 of 6 in current phase (BOOT FAILED - 3 attempts, blob versions suspected)
+Status: BLOCKED - Boot test #3 failed, rkbin blob versions are primary suspect
+Last activity: 2026-02-03 - Completed 02-06-PLAN.md (Mainline U-Boot v2025.10 - FAILED)
 
-Progress: [========............] 40%
+Progress: [=========...........] 45%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8
-- Average duration: ~32min
-- Total execution time: ~4h 31min
+- Total plans completed: 9
+- Average duration: ~31min
+- Total execution time: ~5h 11min
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-environment-setup | 3 | ~2h 50min | ~55min |
-| 02-bootloader | 5 | ~1h 41min | ~20min |
+| 02-bootloader | 6 | ~2h 21min | ~23min |
 
 **Recent Trend:**
-- Last 5 plans: ~2min, ~45min, ~8min, ~45min (02-05 build+test)
-- Trend: Hardware testing adds significant time
+- Last 5 plans: ~45min, ~8min, ~45min, ~1h (02-06 build+test)
+- Trend: Hardware testing cycles dominate execution time
 
 *Updated after each plan completion*
 
@@ -52,19 +52,18 @@ Recent decisions affecting current work:
 - [01-02]: Local build command: `make local-talos-sbc-rk3588-mainline DEST=_out`
 - [01-03]: Use rdisk raw device for faster flash writes on macOS
 - [01-03]: LED-based verification for non-UART debugging
-- [02-01]: Use nanopi-r6c-rk3588s_defconfig as base (same RK3588S SoC)
-- [02-01]: DDR blob v1.16 with LPDDR5 support, BL31 v1.45
+- [02-01]: ~~Use nanopi-r6c-rk3588s_defconfig as base~~ SUPERSEDED by 02-06
+- [02-01]: DDR blob v1.16 with LPDDR5 support, BL31 v1.45 (SUSPECT - may need update)
 - [02-02]: LED-based verification primary method (U-Boot has no HDMI driver)
 - [02-02]: 3-tier iteration strategy for systematic debugging
 - [02-03]: nanopi-r6c/rock5a defconfig DOES NOT WORK for NanoPi M6 (VALIDATED - boot failed)
-- [02-03]: Need Armbian U-Boot configuration extraction for M6-specific support
-- [02-04]: ~~Root cause: wrong device tree (rock5a vs nanopi-m6)~~ INVALIDATED by 02-05
-- [02-04]: Use Armbian nanopi-m6-rk3588s_defconfig directly (Option A recommended)
-- [02-04]: Download defconfig and DTS from Armbian during build
+- [02-04]: Use Armbian nanopi-m6-rk3588s_defconfig directly (COMPLETED in 02-06)
 - [02-05]: Device tree patching DOES NOT fix boot (same failure as Attempt #1)
-- [02-05]: Root cause is deeper: rock5a defconfig fundamentally incompatible
-- [02-05]: Collabora U-Boot fork (v2023.07) may lack M6 support entirely
-- [02-05]: DECISION NEEDED: Switch to mainline U-Boot or acquire UART
+- [02-05]: ~~Collabora U-Boot fork (v2023.07) may lack M6 support entirely~~ CONFIRMED, switched to mainline
+- [02-06]: **Switched to mainline U-Boot v2025.10** (same as Armbian)
+- [02-06]: **U-Boot source/version is NOT the root cause** (still fails with mainline)
+- [02-06]: **Primary suspect: DDR/BL31 blob version mismatch** (v1.16/v1.45 vs Armbian v1.18/v1.48)
+- [02-06]: Secondary suspect: SD card boot path (may need eMMC boot test)
 
 ### Pending Todos
 
@@ -72,31 +71,43 @@ None.
 
 ### Blockers/Concerns
 
-**ACTIVE BLOCKER - Phase 2 (Tier 3 Decision Point):**
-- Boot test #2 FAILED: Device tree patching did not fix boot
-- Identical symptoms to Attempt #1 (no LED activity, no HDMI, no network)
-- Device tree is NOT the root cause - failure occurs before DT parsing
-- rock5a defconfig has fundamental incompatibilities with NanoPi M6
-- Collabora U-Boot fork (v2023.07) may lack M6 board support entirely
+**ACTIVE BLOCKER - Phase 2 (Tier 3 - Continued Investigation):**
+- Boot test #3 FAILED: Mainline U-Boot v2025.10 with native M6 defconfig does not boot
+- Identical symptoms to Attempts #1 and #2 (no LED activity, no HDMI, no network)
+- Failure occurs at DDR/TPL stage (before device tree parsing, before SPL)
 
-**Root Cause Revision:**
-- ~~Wrong device tree~~ INVALIDATED - same failure with correct DT
-- **Actual cause:** Deeper incompatibility in SPL/DDR/board init code
-- Armbian uses mainline U-Boot v2025.10, not Collabora fork
-- ~2 year version gap between Collabora fork and Armbian's U-Boot
+**Root Cause Analysis - Eliminated:**
+- ~~Wrong device tree~~ ELIMINATED by Attempt #2
+- ~~Wrong defconfig base (rock5a)~~ ELIMINATED by Attempt #3
+- ~~Collabora fork lacks M6 support~~ ELIMINATED by Attempt #3
+- ~~U-Boot version too old~~ ELIMINATED by Attempt #3
 
-**Decision Required - Choose one:**
-1. **Option A (Recommended):** Switch to mainline U-Boot v2025.10
-   - Pros: Armbian proves this works, actual M6 defconfig available
-   - Cons: Breaking change to build system
-2. **Option B:** Apply Armbian patches to Collabora fork
-   - Pros: Keeps current base
-   - Cons: Patches may not apply cleanly, significant effort
-3. **Option C:** Extract Armbian U-Boot binary for direct test
-   - Pros: Quick diagnostic test
-   - Cons: Not a solution, just confirms diagnosis
+**Root Cause Analysis - Current Suspects:**
+1. **DDR blob version mismatch** (HIGH PROBABILITY)
+   - We use: DDR v1.16, BL31 v1.45
+   - Armbian uses: DDR v1.18, BL31 v1.48
+   - DDR training is exactly where boot appears to stall
+   - Common factor across ALL 3 failed attempts
+
+2. **SD card boot not supported** (MEDIUM PROBABILITY)
+   - M6 may only boot from eMMC by default
+   - Need to test eMMC boot path via MaskROM
+
+3. **rkbin repository version** (LOW PROBABILITY)
+   - Different rkbin commit may have interdependent blob versions
+
+**Next Steps - Choose one:**
+1. **Option A (Recommended):** Update rkbin blob versions to match Armbian (v1.18/v1.48)
+   - Pros: Directly addresses #1 suspect, low effort
+   - Cons: Requires rkbin version research
+2. **Option B:** Test eMMC boot path via MaskROM
+   - Pros: Rules out SD card boot as issue
+   - Cons: More complex procedure
+3. **Option C:** Extract and test Armbian's exact u-boot-rockchip.bin
+   - Pros: Quick diagnostic - if it boots, issue is blob/build
+   - Cons: Not a solution, just diagnostic
 4. **Option D:** Acquire UART for detailed debugging
-   - Pros: Exact failure point visible
+   - Pros: Definitive diagnosis
    - Cons: Hardware purchase, time delay
 
 **CI Configuration:**
@@ -110,15 +121,16 @@ None.
 - Build and flash workflow working (02-03 partial - build/flash OK)
 - Armbian config extracted and analyzed (02-04 complete)
 - Device tree patching tested and ruled out (02-05 complete - FAILED)
+- Mainline U-Boot v2025.10 configured and tested (02-06 complete - FAILED)
 
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed 02-05-PLAN.md (Apply M6 Config - BOOT FAILED)
-Resume file: None - awaiting architectural decision
+Stopped at: Completed 02-06-PLAN.md (Mainline U-Boot v2025.10 - BOOT FAILED)
+Resume file: None - awaiting next investigation decision
 
-**Gap status:** OPEN - Device tree approach failed, need different strategy.
-Recommended next action: User decision on which option (A/B/C/D) to pursue.
+**Gap status:** OPEN - Mainline U-Boot approach failed, blob versions are new investigation target.
+Recommended next action: Update rkbin to match Armbian's DDR v1.18 and BL31 v1.48.
 
 ---
 *State initialized: 2026-02-02*
