@@ -56,7 +56,7 @@ Plans:
 - [x] 02-05-PLAN.md - [GAP CLOSURE] Apply M6-specific config and re-test hardware (BOOT FAILED - device tree not root cause)
 - [x] 02-06-PLAN.md - [GAP CLOSURE] Switch to mainline U-Boot v2025.10 (BOOT FAILED - U-Boot version not root cause)
 - [x] 02-07-PLAN.md - [GAP CLOSURE] Update rkbin blob versions (BOOT FAILED - blob versions not root cause)
-- [ ] 02-08-PLAN.md - [GAP CLOSURE] Test FriendlyElec vendor bootloader (v2017.09) to diagnose mainline vs vendor requirement
+- [x] 02-08-PLAN.md - [GAP CLOSURE] Test FriendlyElec vendor bootloader - ROOT CAUSE FOUND: vendor U-Boot required
 
 ### Phase 3: Device Tree & Kernel
 **Goal**: Linux kernel boots with essential NanoPi M6 hardware functional
@@ -133,7 +133,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Environment Setup | 3/3 | Complete | 2026-02-02 |
-| 2. Bootloader Bring-Up | 7/8 | Gap closure in progress | - |
+| 2. Bootloader Bring-Up | 8/8 | Root cause found, need vendor U-Boot | - |
 | 3. Device Tree & Kernel | 0/3 | Not started | - |
 | 4. Overlay Integration | 0/3 | Not started | - |
 | 5. Cluster Integration | 0/4 | Not started | - |

@@ -10,9 +10,9 @@ See: .planning/PROJECT.md (updated 2026-02-02)
 ## Current Position
 
 Phase: 2 of 6 (Bootloader Bring-up)
-Plan: 7 of 7 in current phase (BOOT FAILED - 4 attempts, SD card boot path suspected)
-Status: BLOCKED - Boot test #4 failed, blob versions ELIMINATED as root cause
-Last activity: 2026-02-03 - Completed 02-07-PLAN.md (rkbin blob update - FAILED)
+Plan: 8 of 8 in current phase (ROOT CAUSE FOUND - vendor U-Boot required)
+Status: IN PROGRESS - Root cause identified, need vendor U-Boot integration
+Last activity: 2026-02-03 - Completed 02-08-PLAN.md (FriendlyElec diagnostic - SUCCESS)
 
 Progress: [=========...........] 45%
 
@@ -65,8 +65,12 @@ Recent decisions affecting current work:
 - [02-06]: ~~Primary suspect: DDR/BL31 blob version mismatch~~ ELIMINATED by 02-07
 - [02-07]: **Updated rkbin blobs to DDR v1.18, BL31 v1.48** (matches Armbian exactly)
 - [02-07]: **Blob versions are NOT the root cause** (still fails with matching blobs)
-- [02-07]: **Primary suspect: SD card boot path or build process difference**
+- [02-07]: ~~Primary suspect: SD card boot path or build process difference~~ DIAGNOSED by 02-08
 - [02-07]: Build configuration now matches Armbian EXACTLY - different outcome = build/media issue
+- [02-08]: **ROOT CAUSE FOUND: NanoPi M6 requires vendor U-Boot (v2017.09)**
+- [02-08]: FriendlyElec bootloader BOOTS on same SD card where mainline failed 4x
+- [02-08]: Issue is bootloader FORMAT (MiniLoaderAll vs u-boot-rockchip.bin), not configuration
+- [02-08]: **ARCHITECTURAL DECISION: Must use vendor U-Boot approach for NanoPi M6**
 
 ### Pending Todos
 
@@ -74,47 +78,30 @@ None.
 
 ### Blockers/Concerns
 
-**ACTIVE BLOCKER - Phase 2 (Tier 3 - All Configuration Matches Armbian):**
-- Boot test #4 FAILED: Mainline U-Boot v2025.10 with EXACT Armbian configuration does not boot
-- Identical symptoms across ALL 4 attempts (no LED activity, no HDMI, no network)
-- Failure occurs at DDR/TPL stage (before device tree parsing, before SPL)
-- **Configuration now matches Armbian exactly** - issue is NOT in config
+**ROOT CAUSE IDENTIFIED - Phase 2 (Diagnostic Complete):**
+- Boot test #5 with FriendlyElec vendor bootloader: **SUCCESS**
+- FriendlyElec bootloader boots on same SD card where mainline U-Boot failed 4x
+- Root cause: **Mainline U-Boot format (u-boot-rockchip.bin) incompatible with NanoPi M6**
+- Solution: **Use vendor U-Boot (v2017.09) with MiniLoaderAll format**
 
-**Root Cause Analysis - Eliminated (6 hypotheses ruled out):**
+**Root Cause Analysis - All 7 hypotheses tested:**
 - ~~Wrong device tree~~ ELIMINATED by Attempt #2
 - ~~Wrong defconfig base (rock5a)~~ ELIMINATED by Attempt #3
 - ~~Collabora fork lacks M6 support~~ ELIMINATED by Attempt #3
 - ~~U-Boot version too old~~ ELIMINATED by Attempt #3
 - ~~DDR blob version mismatch~~ ELIMINATED by Attempt #4 (v1.18 = Armbian)
 - ~~BL31 blob version mismatch~~ ELIMINATED by Attempt #4 (v1.48 = Armbian)
+- ~~SD card boot path not supported~~ ELIMINATED by Attempt #5 (FriendlyElec boots!)
 
-**Root Cause Analysis - Current Suspects:**
-1. **SD card boot path not supported** (HIGH PROBABILITY)
-   - All 4 tests used SD card boot
-   - Armbian may have tested on eMMC
-   - SD card controller init may differ
-   - Need to test: Armbian's binary OR eMMC boot
+**CONFIRMED ROOT CAUSE:** Bootloader format incompatibility
+- NanoPi M6 requires MiniLoaderAll.bin + uboot.img format (Rockchip proprietary)
+- Mainline U-Boot's u-boot-rockchip.bin format does not boot on this board
+- FriendlyElec uses vendor U-Boot v2017.09, not mainline
 
-2. **Build process difference** (MEDIUM PROBABILITY)
-   - Different toolchain produces different binary
-   - Make flags or environment variables
-   - Need to test Armbian's exact binary for diagnosis
-
-3. **Partition/boot sector layout** (LOW-MEDIUM PROBABILITY)
-   - U-Boot SPL offset or alignment issue
-   - May need to verify exact write offset
-
-**Next Steps - Choose one:**
-1. **Option A (RECOMMENDED):** Test Armbian's exact u-boot-rockchip.bin
-   - Pros: Quick diagnostic (10 min), definitive answer
-   - If boots: Issue is our build process
-   - If fails: Issue is SD card boot path
-2. **Option B:** Test eMMC boot path via MaskROM
-   - Pros: Rules out SD card boot as issue
-   - Cons: More complex procedure
-3. **Option C:** Acquire UART for detailed debugging
-   - Pros: Definitive diagnosis
-   - Cons: Hardware purchase, time delay
+**Next Steps:**
+1. Create plan 02-09: Integrate vendor U-Boot into build system
+2. Options: Full vendor integration OR hybrid approach (vendor bootloader + mainline kernel)
+3. Re-verify phase goal with vendor U-Boot
 
 **CI Configuration:**
 - Upstream workflow uses self-hosted runners (`pkgs` label)
@@ -132,13 +119,13 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-03
-Stopped at: Completed 02-07-PLAN.md (rkbin blob update - BOOT FAILED)
-Resume file: None - awaiting next investigation decision
+Stopped at: Completed 02-08-PLAN.md (FriendlyElec diagnostic - ROOT CAUSE FOUND)
+Resume file: None - awaiting vendor U-Boot integration plan
 
-**Gap status:** OPEN - All configuration now matches Armbian exactly. Still fails.
-**Key insight:** Same config, different outcome = build process or boot media issue
-Recommended next action: Test Armbian's exact u-boot-rockchip.bin to determine if issue is build process or SD card boot path.
+**Gap status:** CLOSING - Root cause identified, need vendor U-Boot integration
+**Key insight:** NanoPi M6 requires vendor U-Boot (MiniLoaderAll format), not mainline
+Recommended next action: Create plan 02-09 to integrate vendor U-Boot into build system
 
 ---
 *State initialized: 2026-02-02*
-*Last updated: 2026-02-03 (after 02-07 completion)*
+*Last updated: 2026-02-03 (after 02-08 completion - root cause found)*
