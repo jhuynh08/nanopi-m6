@@ -46,7 +46,7 @@ Plans:
   2. DDR memory initializes (LPDDR5 blob loads correctly)
   3. Boot activity observable (LED blink or eventual kernel HDMI output)
   4. Recovery procedure documented and tested (MaskROM mode)
-**Plans**: 8 plans in 3 waves (includes 5 gap closure plans)
+**Plans**: 9 plans (includes 6 gap closure plans)
 
 Plans:
 - [x] 02-01-PLAN.md - Create U-Boot build configuration for NanoPi M6
@@ -57,6 +57,7 @@ Plans:
 - [x] 02-06-PLAN.md - [GAP CLOSURE] Switch to mainline U-Boot v2025.10 (BOOT FAILED - U-Boot version not root cause)
 - [x] 02-07-PLAN.md - [GAP CLOSURE] Update rkbin blob versions (BOOT FAILED - blob versions not root cause)
 - [x] 02-08-PLAN.md - [GAP CLOSURE] Test FriendlyElec vendor bootloader - ROOT CAUSE FOUND: vendor U-Boot required
+- [ ] 02-09-PLAN.md - [GAP CLOSURE] Integrate FriendlyELEC vendor U-Boot into build system
 
 ### Phase 3: Device Tree & Kernel
 **Goal**: Linux kernel boots with essential NanoPi M6 hardware functional
@@ -133,7 +134,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Environment Setup | 3/3 | Complete | 2026-02-02 |
-| 2. Bootloader Bring-Up | 8/8 | Root cause found, need vendor U-Boot | - |
+| 2. Bootloader Bring-Up | 8/9 | Vendor U-Boot integration in progress | - |
 | 3. Device Tree & Kernel | 0/3 | Not started | - |
 | 4. Overlay Integration | 0/3 | Not started | - |
 | 5. Cluster Integration | 0/4 | Not started | - |
@@ -141,4 +142,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-03 (Phase 2 plan 08 added - Armbian bootloader diagnostic test)*
+*Last updated: 2026-02-03 (Phase 2 plan 09 added - FriendlyELEC vendor U-Boot integration)*
