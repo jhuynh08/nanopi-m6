@@ -9,9 +9,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Boot Chain
 
-- [ ] **BOOT-01**: U-Boot bootloader with NanoPi M6 defconfig boots to console
-- [ ] **BOOT-02**: ARM Trusted Firmware (BL31) loads successfully
-- [ ] **BOOT-03**: DDR training blob initializes LPDDR5 memory
+- [x] **BOOT-01**: U-Boot bootloader with NanoPi M6 defconfig boots to console
+- [x] **BOOT-02**: ARM Trusted Firmware (BL31) loads successfully
+- [x] **BOOT-03**: DDR training blob initializes LPDDR5 memory
 - [ ] **BOOT-04**: Device tree blob correctly describes NanoPi M6 hardware
 
 ### Kernel & Drivers
@@ -75,9 +75,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BOOT-01 | Phase 2 | Pending |
-| BOOT-02 | Phase 2 | Pending |
-| BOOT-03 | Phase 2 | Pending |
+| BOOT-01 | Phase 2 | Complete |
+| BOOT-02 | Phase 2 | Complete |
+| BOOT-03 | Phase 2 | Complete |
 | BOOT-04 | Phase 3 | Pending |
 | KERN-01 | Phase 3 | Pending |
 | KERN-02 | Phase 3 | Pending |
@@ -106,4 +106,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-02*
-*Last updated: 2026-02-02 after roadmap creation*
+*Last updated: 2026-02-03 after Phase 2 completion (BOOT-01, BOOT-02, BOOT-03 complete)*

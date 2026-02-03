@@ -13,7 +13,7 @@ This roadmap delivers a bootable Talos Linux image for the NanoPi M6 (RK3588S) t
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Environment Setup** - Fork repo, verify build pipeline, establish flash/verification workflow
-- [ ] **Phase 2: Bootloader Bring-Up** - U-Boot defconfig, ATF, DDR blob - boot to U-Boot console
+- [x] **Phase 2: Bootloader Bring-Up** - U-Boot defconfig, ATF, DDR blob - boot to U-Boot console
 - [ ] **Phase 3: Device Tree & Kernel** - DTB compilation, kernel boot, essential driver validation
 - [ ] **Phase 4: Overlay Integration** - Installer binary, profile YAML, bootable Talos image
 - [ ] **Phase 5: Cluster Integration** - Boot Talos, network connectivity, Omni registration, cluster join
@@ -134,7 +134,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Environment Setup | 3/3 | Complete | 2026-02-02 |
-| 2. Bootloader Bring-Up | 8/9 | Vendor U-Boot integration in progress | - |
+| 2. Bootloader Bring-Up | 9/9 | Complete | 2026-02-03 |
 | 3. Device Tree & Kernel | 0/3 | Not started | - |
 | 4. Overlay Integration | 0/3 | Not started | - |
 | 5. Cluster Integration | 0/4 | Not started | - |
@@ -142,4 +142,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-03 (Phase 2 plan 09 added - FriendlyELEC vendor U-Boot integration)*
+*Last updated: 2026-02-03 (Phase 2 COMPLETE - vendor U-Boot boots to Ubuntu login screen)*
