@@ -42,16 +42,18 @@ Plans:
 **Depends on**: Phase 1
 **Requirements**: BOOT-01, BOOT-02, BOOT-03
 **Success Criteria** (what must be TRUE):
-  1. U-Boot binary compiles with nanopi-r6c-rk3588s_defconfig
+  1. U-Boot binary compiles with NanoPi M6-specific defconfig
   2. DDR memory initializes (LPDDR5 blob loads correctly)
   3. Boot activity observable (LED blink or eventual kernel HDMI output)
   4. Recovery procedure documented and tested (MaskROM mode)
-**Plans**: 3 plans in 2 waves
+**Plans**: 5 plans in 3 waves (includes 2 gap closure plans)
 
 Plans:
-- [ ] 02-01-PLAN.md - Create U-Boot build configuration for NanoPi M6
-- [ ] 02-02-PLAN.md - Create recovery and iteration documentation
-- [ ] 02-03-PLAN.md - Build U-Boot and verify boot on hardware
+- [x] 02-01-PLAN.md - Create U-Boot build configuration for NanoPi M6
+- [x] 02-02-PLAN.md - Create recovery and iteration documentation
+- [x] 02-03-PLAN.md - Build U-Boot and verify boot on hardware (BOOT FAILED - rock5a defconfig insufficient)
+- [ ] 02-04-PLAN.md - [GAP CLOSURE] Extract Armbian NanoPi M6 U-Boot configuration
+- [ ] 02-05-PLAN.md - [GAP CLOSURE] Apply M6-specific config and re-test hardware
 
 ### Phase 3: Device Tree & Kernel
 **Goal**: Linux kernel boots with essential NanoPi M6 hardware functional
@@ -128,7 +130,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Environment Setup | 3/3 | Complete | 2026-02-02 |
-| 2. Bootloader Bring-Up | 0/3 | Ready | - |
+| 2. Bootloader Bring-Up | 3/5 | Gap closure in progress | - |
 | 3. Device Tree & Kernel | 0/3 | Not started | - |
 | 4. Overlay Integration | 0/3 | Not started | - |
 | 5. Cluster Integration | 0/4 | Not started | - |
@@ -136,4 +138,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-02 (Phase 2 planned)*
+*Last updated: 2026-02-02 (Phase 2 gap closure plans added)*
