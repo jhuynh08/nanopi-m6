@@ -9,9 +9,10 @@ vars:
   uboot_sha512: 8a1826c14e26d7a86da91d771f7629bce866cb0b77d5acbd14f2e35b7a0fe556928caecd420659b77f0f59414c492198b7f5aa8a27161fb26a45079a8aad5fec
 
   # renovate: datasource=git-refs versioning=git depName=https://github.com/rockchip/rkbin
-  rkbin_ref: a2a0b89b6c8c612dca5ed9ed8a68db8a07f68bc0
-  rkbin_sha256: 9df375316869daadbf874410f4097591c32cc2dca5a30fd328ea7a1cd8f8b6a8
-  rkbin_sha512: 715253b5ef5c7fbcbce8478d4dea5ad3d1b4b738da437b5f0e9b31eed20f9bcb86cab082e4c04c69b42b6ffcc2cbb1a31079b33b968bb76826ff0dd4f83043e1
+  # Updated to match Armbian blob versions: DDR v1.18, BL31 v1.48
+  rkbin_ref: 0f8ac860f0479da56a1decae207ddc99e289f2e2
+  rkbin_sha256: c0e3ec5c6af86ebb317c4eeb393a95b6c87519707b6a34a164ee451bb27c98ff
+  rkbin_sha512: 4287fb19042e9b090e8eb51287eef289224c6ae95f6bc3e9040eaa4d783a28e377685e4d32a984b8a49ab5bd95b885248e910a644d088d679b4cdd94cd735de9
 
   # renovate: datasource=git-tags extractVersion=^v(?<version>.*)$ depName=git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git
   linux_mainline_version: 6.9.0
