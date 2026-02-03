@@ -9,32 +9,28 @@ steps:
       SOURCE_DATE_EPOCH: {{ .BUILD_ARG_SOURCE_DATE_EPOCH }}
       ROCKCHIP_TPL: /libs/rkbin/bin/rk35/rk3588_ddr_lp4_2112MHz_lp5_2400MHz_v1.16.bin
       BL31: /libs/rkbin/bin/rk35/rk3588_bl31_v1.45.elf
+      # Debug logging for boot troubleshooting (can be removed once boot works)
       CFLAGS: "-DCONFIG_LOG=y -DCONFIG_LOG_CONSOLE=y -DCONFIG_LOG_MAX_LEVEL=9"
     prepare:
       - |
         cd /src
 
-        # Copy minimal NanoPi M6 device tree (local, compatible with Collabora U-Boot)
-        # Based on Armbian's DTS but stripped down for U-Boot 2023.07 compatibility
-        # Key differences from Rock5A: LEDs (GPIO1_A4/A6), tx_delay (0x42), SD card GPIO
-        cp /pkg/rk3588s-nanopi-m6.dts arch/arm/dts/
+        # Download NanoPi M6 defconfig from Armbian (tested, working configuration)
+        # Armbian maintains this defconfig for U-Boot v2025.10 with native M6 support
+        curl -fsSL -o configs/nanopi-m6-rk3588s_defconfig \
+          "https://raw.githubusercontent.com/armbian/build/main/patch/u-boot/v2025.10/defconfig/nanopi-m6-rk3588s_defconfig"
+
+        # Download NanoPi M6 device tree from Armbian
+        # This DTS includes correct GPIO pins, PMIC config, ethernet, and LED definitions
+        curl -fsSL -o arch/arm/dts/rk3588s-nanopi-m6.dts \
+          "https://raw.githubusercontent.com/armbian/build/main/patch/u-boot/v2025.10/dt_upstream_rockchip/rk3588s-nanopi-m6.dts"
 
         # Add nanopi-m6 to the device tree Makefile so it gets compiled
         # Insert after rk3588s-rock-5a.dtb line
         sed -i '/rk3588s-rock-5a.dtb/a\	rk3588s-nanopi-m6.dtb \\' arch/arm/dts/Makefile
 
-        # Start with rock5a defconfig (compatible with Collabora U-Boot fork)
-        make rock5a-rk3588s_defconfig
-
-        # Patch config to use NanoPi M6 device tree instead of Rock 5A
-        # This is the ROOT CAUSE fix: wrong device tree = wrong GPIO/PMIC init = boot failure
-        sed -i 's|CONFIG_DEFAULT_DEVICE_TREE="rk3588s-rock-5a"|CONFIG_DEFAULT_DEVICE_TREE="rk3588s-nanopi-m6"|g' .config
-        sed -i 's|CONFIG_DEFAULT_FDT_FILE="rockchip/rk3588s-rock-5a.dtb"|CONFIG_DEFAULT_FDT_FILE="rockchip/rk3588s-nanopi-m6.dtb"|g' .config
-        # Also update OF_LIST which is used by binman for FIT image generation
-        sed -i 's|CONFIG_OF_LIST="rk3588s-rock-5a"|CONFIG_OF_LIST="rk3588s-nanopi-m6"|g' .config
-
-        # Resolve any new/changed options automatically
-        make olddefconfig
+        # Use Armbian's M6 defconfig directly (no rock5a patching needed)
+        make nanopi-m6-rk3588s_defconfig
     build:
       - |
         cd /src
