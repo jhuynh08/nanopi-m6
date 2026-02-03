@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 3: Device Tree & Kernel** - DTB compilation, kernel boot, essential driver validation
 - [ ] **Phase 4: Overlay Integration** - Installer binary, profile YAML, bootable Talos image
 - [ ] **Phase 5: Cluster Integration** - Boot Talos, network connectivity, Omni registration, cluster join
-- [ ] **Phase 6: Production Hardening** - NVMe, thermal, watchdog, CPU frequency scaling
+- [ ] **Phase 6: Production Hardening** - Thermal, watchdog, CPU frequency scaling
 
 ## Phase Details
 
@@ -57,24 +57,25 @@ Plans:
 - [x] 02-06-PLAN.md - [GAP CLOSURE] Switch to mainline U-Boot v2025.10 (BOOT FAILED - U-Boot version not root cause)
 - [x] 02-07-PLAN.md - [GAP CLOSURE] Update rkbin blob versions (BOOT FAILED - blob versions not root cause)
 - [x] 02-08-PLAN.md - [GAP CLOSURE] Test FriendlyElec vendor bootloader - ROOT CAUSE FOUND: vendor U-Boot required
-- [ ] 02-09-PLAN.md - [GAP CLOSURE] Integrate FriendlyELEC vendor U-Boot into build system
+- [x] 02-09-PLAN.md - [GAP CLOSURE] Integrate FriendlyELEC vendor U-Boot into build system
 
 ### Phase 3: Device Tree & Kernel
 **Goal**: Linux kernel boots with essential NanoPi M6 hardware functional
 **Depends on**: Phase 2
-**Requirements**: BOOT-04, KERN-01, KERN-02, KERN-03, KERN-04
+**Requirements**: BOOT-04, KERN-01, KERN-02, KERN-04, KERN-05
 **Success Criteria** (what must be TRUE):
-  1. Linux kernel boots to console (dmesg visible via UART)
+  1. Linux kernel boots to console (dmesg visible via HDMI)
   2. Gigabit Ethernet interface appears (ip link shows eth0)
-  3. eMMC storage detected and accessible (/dev/mmcblk* exists)
+  3. NVMe storage detected and accessible (/dev/nvme0n1 exists) - **NOTE: Device has no eMMC, NVMe required**
   4. USB host ports enumerate connected devices (lsusb works)
   5. Device tree correctly identifies board as NanoPi M6
-**Plans**: TBD
+**Plans**: 4 plans in 3 waves
 
 Plans:
-- [ ] 03-01: Device tree compilation from Armbian source
-- [ ] 03-02: Kernel build with RK3588S support
-- [ ] 03-03: Driver validation (Ethernet, eMMC, USB)
+- [ ] 03-01-PLAN.md - Add NanoPi M6 device tree to kernel build
+- [ ] 03-02-PLAN.md - Update installer for NanoPi M6 board support
+- [ ] 03-03-PLAN.md - Build complete image and flash to SD card
+- [ ] 03-04-PLAN.md - Hardware driver validation (Ethernet, USB, NVMe)
 
 ### Phase 4: Overlay Integration
 **Goal**: Talos imager produces bootable NanoPi M6 image
@@ -97,7 +98,7 @@ Plans:
 **Depends on**: Phase 4
 **Requirements**: CLST-01, CLST-02, CLST-03, CLST-04, CLST-05
 **Success Criteria** (what must be TRUE):
-  1. Device boots Talos Linux from eMMC without manual intervention
+  1. Device boots Talos Linux from SD card + NVMe root without manual intervention
   2. Network connectivity established (can ping external hosts)
   3. Device appears in Talos Omni dashboard with correct name
   4. Node shows Ready status in kubectl get nodes
@@ -105,7 +106,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 05-01: eMMC flash and boot configuration
+- [ ] 05-01: SD boot + NVMe root configuration
 - [ ] 05-02: Network and machine configuration
 - [ ] 05-03: Omni registration and cluster join
 - [ ] 05-04: Workload validation
@@ -113,18 +114,16 @@ Plans:
 ### Phase 6: Production Hardening
 **Goal**: Node operates reliably under production conditions
 **Depends on**: Phase 5
-**Requirements**: KERN-05, KERN-06, KERN-07, KERN-08
+**Requirements**: KERN-06, KERN-07, KERN-08
 **Success Criteria** (what must be TRUE):
-  1. NVMe drive detected and usable for persistent volumes
-  2. CPU frequency scales dynamically under load (verify with cpufreq-info)
-  3. Thermal sensors report temperature (thermal zone visible)
-  4. Hardware watchdog triggers reboot on simulated hang
+  1. CPU frequency scales dynamically under load (verify with cpufreq-info)
+  2. Thermal sensors report temperature (thermal zone visible)
+  3. Hardware watchdog triggers reboot on simulated hang
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: NVMe enablement and testing
-- [ ] 06-02: Power and thermal management
-- [ ] 06-03: Watchdog configuration and validation
+- [ ] 06-01: Power and thermal management
+- [ ] 06-02: Watchdog configuration and validation
 
 ## Progress
 
@@ -135,11 +134,11 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|----------------|--------|-----------|
 | 1. Environment Setup | 3/3 | Complete | 2026-02-02 |
 | 2. Bootloader Bring-Up | 9/9 | Complete | 2026-02-03 |
-| 3. Device Tree & Kernel | 0/3 | Not started | - |
+| 3. Device Tree & Kernel | 0/4 | Planned | - |
 | 4. Overlay Integration | 0/3 | Not started | - |
 | 5. Cluster Integration | 0/4 | Not started | - |
-| 6. Production Hardening | 0/3 | Not started | - |
+| 6. Production Hardening | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-03 (Phase 2 COMPLETE - vendor U-Boot boots to Ubuntu login screen)*
+*Last updated: 2026-02-03 (Phase 3 planned - 4 plans in 3 waves)*
