@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Environment Setup** - Fork repo, verify build pipeline, establish flash/verification workflow
 - [x] **Phase 2: Bootloader Bring-Up** - U-Boot defconfig, ATF, DDR blob - boot to U-Boot console
 - [x] **Phase 3: Device Tree & Kernel** - DTB compilation, kernel boot, essential driver validation (overlay-complete)
-- [ ] **Phase 4: Overlay Integration** - Installer binary, profile YAML, bootable Talos image
+- [ ] **Phase 4: Overlay Integration** - CI/CD pipeline, Docker Hub publishing, bootable Talos image
 - [ ] **Phase 5: Cluster Integration** - Boot Talos, network connectivity, Omni registration, cluster join
 - [ ] **Phase 6: Production Hardening** - Thermal, watchdog, CPU frequency scaling
 
@@ -78,20 +78,20 @@ Plans:
 - [x] 03-04-PLAN.md - Hardware driver validation (deferred to Phase 4 - needs Talos image)
 
 ### Phase 4: Overlay Integration
-**Goal**: Talos imager produces bootable NanoPi M6 image
+**Goal**: Talos imager produces bootable NanoPi M6 image via CI/CD pipeline
 **Depends on**: Phase 3
 **Requirements**: OVRL-01, OVRL-02, OVRL-03, OVRL-04
 **Success Criteria** (what must be TRUE):
-  1. Installer binary implements overlay.Installer interface (compiles without error)
-  2. Profile YAML passes Talos imager validation
-  3. Overlay container image builds and pushes to registry
+  1. Installer binary implements overlay.Installer interface (compiles without error) - DONE in Phase 3
+  2. Profile YAML passes Talos imager validation - DONE in Phase 3
+  3. Overlay container image builds and pushes to Docker Hub registry
   4. Generated .raw.xz image boots to Talos maintenance mode
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 04-01: Installer binary implementation
-- [ ] 04-02: Profile YAML and overlay packaging
-- [ ] 04-03: Image generation and boot validation
+- [ ] 04-01-PLAN.md - Adapt CI workflow for Docker Hub and nanopi-m6 board
+- [ ] 04-02-PLAN.md - Push version tag and generate raw image via CI
+- [ ] 04-03-PLAN.md - Flash image and validate boot with hardware checks
 
 ### Phase 5: Cluster Integration
 **Goal**: NanoPi M6 joins Omni-managed Kubernetes cluster as functional node
@@ -135,7 +135,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Environment Setup | 3/3 | Complete | 2026-02-02 |
 | 2. Bootloader Bring-Up | 9/9 | Complete | 2026-02-03 |
 | 3. Device Tree & Kernel | 4/4 | Complete (overlay) | 2026-02-03 |
-| 4. Overlay Integration | 0/3 | Not started | - |
+| 4. Overlay Integration | 0/3 | Planned | - |
 | 5. Cluster Integration | 0/4 | Not started | - |
 | 6. Production Hardening | 0/2 | Not started | - |
 
@@ -143,4 +143,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-02-02*
-*Last updated: 2026-02-03 (Phase 3 complete - overlay-complete, hardware validation deferred)*
+*Last updated: 2026-02-03 (Phase 4 planned - CI/CD, Docker Hub, boot validation)*
